@@ -18,6 +18,7 @@ const eof = rune(0)
 const eol = rune(10)
 
 // Lexer - lexical analysis
+// @TODO adds the current line number, to help debug parsing error?
 type Lexer struct {
 	input    string
 	position int               // current position

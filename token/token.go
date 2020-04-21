@@ -42,6 +42,11 @@ func (t *Token) IsComment() bool {
 	return t.Type == Comment
 }
 
+// IsError is the token an error?
+func (t *Token) IsError() bool {
+	return t.Type == Err
+}
+
 // IsWhitespace is the token a whitespace?
 func (t *Token) IsWhitespace() bool {
 	return t.Type == Whitespace

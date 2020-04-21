@@ -3,23 +3,10 @@ package parser
 import (
 	"fmt"
 
+	"github.com/mickaelvieira/saxifrage/config"
 	"github.com/mickaelvieira/saxifrage/lexer"
 	"github.com/mickaelvieira/saxifrage/token"
 )
-
-// SSHConfig --
-type SSHConfig struct {
-	Host   string
-	Config map[string]string
-}
-
-// NewConfig --
-func NewConfig(hosts string) *SSHConfig {
-	return &SSHConfig{
-		Host:   hosts,
-		Config: make(map[string]string),
-	}
-}
 
 // Parser --
 type Parser struct {
@@ -28,38 +15,42 @@ type Parser struct {
 }
 
 // Parse --
-func (p *Parser) Parse() ([]*SSHConfig, error) {
-	var configs []*SSHConfig
-	var lastKey string
-	var expectValue bool
-	var expectMatch bool
+func (p *Parser) Parse() ([]*config.Section, error) {
+	var sections []*config.Section
+	var keyword string
+	var section config.SectionType
 
 	go p.lexer.Lex()
 
 	for t := range p.tokens {
 		if !t.IsComment() && !t.IsEOF() && !t.IsEOL() && !t.IsWhitespace() {
-			if t.IsSection() {
-				expectMatch = true
-			} else if t.IsKeyword() {
-				lastKey = t.Value
-				expectValue = true
-			} else if t.IsValue() && expectMatch {
-				configs = append(configs, NewConfig(t.Value))
-				expectMatch = false
-			} else if t.IsValue() && expectValue {
-				if lastKey == "" {
-					return configs, fmt.Errorf("lastKey is not defined")
+			switch {
+			case t.IsSection():
+				section = config.HostType
+				if t.IsMatchSection() {
+					section = config.MatchType
 				}
-				configs[len(configs)-1].Config[lastKey] = t.Value
-				expectValue = false
-			} else if (expectMatch || expectValue) && !t.IsValue() {
-				return configs, fmt.Errorf("A value was expected")
-			} else {
-				return configs, fmt.Errorf("Unexpected token")
+			case t.IsKeyword():
+				keyword = t.Value
+			case t.IsValue() && section != "":
+				sections = append(sections, config.NewSection(section, t.Value))
+				section = ""
+			case t.IsValue() && keyword != "":
+				idx := len(sections) - 1
+				sections[idx].Configs[keyword] = t.Value
+				keyword = ""
+			case keyword != "" && !t.IsValue():
+				return sections, fmt.Errorf("A value was expected for keyword %s", keyword)
+			case section != "" && !t.IsValue():
+				return sections, fmt.Errorf("A value was expected for section %s", section)
+			case t.IsError():
+				return sections, fmt.Errorf("Lexing error: %s", t.Value)
+			default:
+				return sections, fmt.Errorf("Unexpected token")
 			}
 		}
 	}
-	return configs, nil
+	return sections, nil
 }
 
 // New creates a new parser
