@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/mickaelvieira/saxifrage/config"
 	"github.com/mickaelvieira/saxifrage/formatter"
 	"github.com/mickaelvieira/saxifrage/parser"
@@ -8,6 +10,13 @@ import (
 )
 
 func runList(ctx *cli.Context) error {
+
+	t, err := askForKeyType()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(t)
 	gc, err := parser.ParseFile(config.GetGlobalConfigPath())
 	if err != nil {
 		return err
