@@ -3,8 +3,6 @@ package lexer
 import (
 	"errors"
 	"unicode/utf8"
-
-	"github.com/mickaelvieira/saxifrage/token"
 )
 
 // Lexing errors
@@ -20,14 +18,14 @@ const eol = rune(10)
 // Lexer - lexical analysis
 // @TODO adds the current line number, to help debug parsing error?
 type Lexer struct {
-	input    string
-	position int               // current position
-	width    int               // last rune's width
-	tokens   chan *token.Token // channel to send tokens over
+	input    string      // input string on which the lexical analysis
+	position int         // current position
+	width    int         // last rune's width
+	tokens   chan *Token // channel to send tokens over
 }
 
 // New create a new Lexer
-func New(i string, c chan *token.Token) *Lexer {
+func New(i string, c chan *Token) *Lexer {
 	return &Lexer{
 		input:  i,
 		tokens: c,
@@ -69,30 +67,19 @@ func (l *Lexer) lexWhitespaces() string {
 }
 
 // move to the end of line
-func (l *Lexer) lexComments() string {
-	var s string
-	c := l.next()
-	for !isEOL(c) {
+func (l *Lexer) lexComments() (s string) {
+	for c := l.next(); !isEOL(c); c = l.next() {
 		s += string(c)
-		c = l.next()
 	}
 	l.rewind()
 	return s
 }
 
-func (l *Lexer) lexWord() string {
-	var s string
-	c := l.next()
-	for {
-		if isWhitespace(c) || isEOL(c) || isEOF(c) {
-			break
-		}
-
+func (l *Lexer) lexWord() (s string) {
+	for c := l.next(); !isWhitespace(c) && !isEOL(c) && !isEOF(c); c = l.next() {
 		s += string(c)
-		c = l.next()
 	}
 	l.rewind()
-
 	return s
 }
 
@@ -141,18 +128,18 @@ func (l *Lexer) lexChar() string {
 func (l *Lexer) Lex() {
 	var ev bool
 
-	tokenize := func(r rune) *token.Token {
+	tokenize := func(r rune) *Token {
 		if isWhitespace(r) {
-			return &token.Token{Type: token.Whitespace, Value: l.lexWhitespaces()}
+			return &Token{Type: Whitespace, Value: l.lexWhitespaces()}
 		}
 		if isHash(r) {
-			return &token.Token{Type: token.Comment, Value: l.lexComments()}
+			return &Token{Type: Comment, Value: l.lexComments()}
 		}
 		if isEOL(r) {
-			return &token.Token{Type: token.EOL, Value: l.lexChar()}
+			return &Token{Type: EOL, Value: l.lexChar()}
 		}
 		if isEOF(r) {
-			return &token.Token{Type: token.EOF, Value: l.lexChar()}
+			return &Token{Type: EOF, Value: l.lexChar()}
 		}
 
 		if ev {
@@ -160,25 +147,24 @@ func (l *Lexer) Lex() {
 			ev = false
 
 			if err != nil {
-				return &token.Token{Type: token.Err, Value: err.Error()}
+				return &Token{Type: Err, Value: err.Error()}
 			}
-			return &token.Token{Type: token.Value, Value: v}
+			return &Token{Type: Value, Value: v}
 		}
 
 		w := l.lexWord()
 		ev = true
 
-		t := token.Section
+		t := Section
 		if isKeyword(w) {
-			t = token.Keyword
+			t = Keyword
 		}
 
-		return &token.Token{Type: t, Value: w}
+		return &Token{Type: t, Value: w}
 	}
 
-	for t := tokenize(l.peek()); !t.IsEOF(); {
+	for t := tokenize(l.peek()); !t.IsEOF(); t = tokenize(l.peek()) {
 		l.tokens <- t
-		t = tokenize(l.peek())
 	}
 	close(l.tokens)
 }

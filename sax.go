@@ -1,26 +1,26 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"os"
 
-	"github.com/mickaelvieira/saxifrage/config"
-	"github.com/mickaelvieira/saxifrage/parser"
+	"github.com/mickaelvieira/saxifrage/cmd"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	c := config.GetUserConfigContent()
-	p := parser.New(string(c))
+	commands := make([]*cli.Command, 3)
+	commands[0] = cmd.List()
+	commands[1] = cmd.Generate()
+	commands[2] = cmd.Dump()
 
-	sections, err := p.Parse()
-	if err != nil {
-		log.Fatal(err)
+	app := &cli.App{
+		Usage:    "Manage your ssh_config",
+		Commands: commands,
 	}
 
-	for _, c := range sections {
-		fmt.Printf("%s %s\n", string(c.Type), c.Matching)
-		for k, v := range c.Configs {
-			fmt.Printf("    %s %s\n", k, v)
-		}
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
 	}
 }

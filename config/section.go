@@ -9,6 +9,14 @@ const (
 	MatchType SectionType = "Match"
 )
 
+// Sections contains the section found in ssh_config files
+type Sections []*Section
+
+// Filter the sections
+func (s Sections) Filter() []*Section {
+	panic("not implemented")
+}
+
 // Section --
 type Section struct {
 	Type     SectionType

@@ -3,8 +3,6 @@ package lexer
 import (
 	"fmt"
 	"testing"
-
-	"github.com/mickaelvieira/saxifrage/token"
 )
 
 func TestNext(t *testing.T) {
@@ -190,57 +188,57 @@ func TestValues(t *testing.T) {
 	}
 }
 
-func TestScan(t *testing.T) {
+func TestLexing(t *testing.T) {
 	cases := []struct {
-		want *token.Token
+		want *Token
 	}{
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Section, Value: "Host"}},
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Value, Value: "*"}},
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Comment, Value: "# here is the first comment"}},
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
+		{&Token{Type: EOL, Value: string(eol)}},
+		{&Token{Type: EOL, Value: string(eol)}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Section, Value: "Host"}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Value, Value: "*"}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Comment, Value: "# here is the first comment"}},
+		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Keyword, Value: "VisualHostKey"}},
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Value, Value: "foo"}},
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Comment, Value: "# here is the second comment"}},
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Keyword, Value: "VisualHostKey"}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Value, Value: "foo"}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Comment, Value: "# here is the second comment"}},
+		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Comment, Value: "# This is the third comment"}},
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Comment, Value: "# This is the third comment"}},
+		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Keyword, Value: "HostName"}},
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Value, Value: "bar"}},
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Keyword, Value: "HostName"}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Value, Value: "bar"}},
+		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
+		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&token.Token{Type: token.Keyword, Value: "ServerAliveInterval"}},
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
+		{&Token{Type: Keyword, Value: "ServerAliveInterval"}},
+		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
+		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&token.Token{Type: token.Value, Value: "foobar"}},
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
+		{&Token{Type: Value, Value: "foobar"}},
+		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&token.Token{Type: token.EOL, Value: string(eol)}},
+		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&token.Token{Type: token.Keyword, Value: "VerifyHostKeyDNS"}},
-		{&token.Token{Type: token.Whitespace, Value: " "}},
-		{&token.Token{Type: token.Value, Value: "baz"}},
-		{&token.Token{Type: token.EOF, Value: string(eof)}},
+		{&Token{Type: Keyword, Value: "VerifyHostKeyDNS"}},
+		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Value, Value: "baz"}},
+		{&Token{Type: EOF, Value: string(eof)}},
 	}
 
-	tokens := make(chan *token.Token)
+	tokens := make(chan *Token)
 	l := Lexer{
 		tokens: tokens,
 		input: `

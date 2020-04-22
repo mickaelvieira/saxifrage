@@ -1,4 +1,4 @@
-package token
+package lexer
 
 // Type lexer token type
 type Type int
@@ -74,5 +74,10 @@ func (t *Token) IsMatchSection() bool {
 
 // String returns the token as a string
 func (t *Token) String() string {
-	return t.Value
+	switch {
+	case t.IsEOF():
+		return "EOF"
+	default:
+		return t.Value
+	}
 }
