@@ -1,29 +1,25 @@
 package cmd
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/mickaelvieira/saxifrage/config"
+	"github.com/mickaelvieira/saxifrage/formatter"
 	"github.com/mickaelvieira/saxifrage/parser"
 	"github.com/urfave/cli/v2"
 )
 
 func runList(ctx *cli.Context) error {
-	c := config.GetUserConfigContent()
-	p := parser.New(string(c))
-
-	sections, err := p.Parse()
+	gc, err := parser.ParseFile(config.GetGlobalConfigPath())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	for _, c := range sections {
-		fmt.Printf("%s %s\n", string(c.Type), c.Matching)
-		for k, v := range c.Configs {
-			fmt.Printf("    %s %s\n", k, v)
-		}
+	uc, err := parser.ParseFile(config.GetUserConfigPath())
+	if err != nil {
+		return err
 	}
+
+	formatter.List(gc)
+	formatter.List(uc)
 
 	return nil
 }

@@ -2,6 +2,8 @@ package parser
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 
 	"github.com/mickaelvieira/saxifrage/config"
 	"github.com/mickaelvieira/saxifrage/lexer"
@@ -65,4 +67,30 @@ func New(i string) *Parser {
 		tokens: c,
 		lexer:  lexer.New(i, c),
 	}
+}
+
+// loadContent loads the file's content or panic if there are any errors
+func loadContent(path string) (s string, err error) {
+	b, err := ioutil.ReadFile(filepath.Clean(path))
+	if err != nil {
+		return s, err
+	}
+	s = string(b)
+	return s, nil
+}
+
+// ParseFile parses the file content and returns configuration file structure
+func ParseFile(path string) (*config.File, error) {
+	c, err := loadContent(path)
+	if err != nil {
+		return nil, err
+	}
+	p := New(string(c))
+
+	s, err := p.Parse()
+	if err != nil {
+		return nil, err
+	}
+
+	return &config.File{Path: path, Sections: s, Tokens: p.Tokens}, nil
 }

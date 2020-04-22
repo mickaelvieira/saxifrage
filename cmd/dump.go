@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/mickaelvieira/saxifrage/config"
 	"github.com/mickaelvieira/saxifrage/parser"
@@ -10,22 +9,21 @@ import (
 )
 
 func runDump(ctx *cli.Context) error {
-	fmt.Println("added task: ", ctx.Args().First())
-
-	c := config.GetUserConfigContent()
-	p := parser.New(string(c))
-
-	_, err := p.Parse()
+	gc, err := parser.ParseFile(config.GetGlobalConfigPath())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	var s string
-	for _, token := range p.Tokens {
-		s += token.String()
+	fmt.Printf("\nFile: %s\n\n", gc.Path)
+	fmt.Printf("%s", gc)
+
+	uc, err := parser.ParseFile(config.GetUserConfigPath())
+	if err != nil {
+		return err
 	}
 
-	fmt.Println(s)
+	fmt.Printf("\nFile: %s\n\n", uc.Path)
+	fmt.Printf("%s", uc)
 
 	return nil
 }
