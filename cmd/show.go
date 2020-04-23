@@ -34,8 +34,8 @@ func runList(a *App) error {
 // list creates the list command
 func list() *command {
 	return &command{
-		Name:   "list",
-		Usage:  "List your ssh configuration",
+		Name:   "show",
+		Usage:  "Show your SSH configuration",
 		Action: runList,
 	}
 }

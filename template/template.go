@@ -48,11 +48,11 @@ var (
 {{ range .Commands}}
   {{ .Name }}         {{ .Usage }}{{ end }}
 `
-	dumpTemplate = `
-{{ range .Files }}
+	dumpTemplate = `{{ range .Files }}
 {{ divider | bold }}
-	{{ "File" | bold }} {{ .Path | bold | green  }}
+ {{ "File" | bold }} {{ .Path | bold | green  }}
 {{ divider | bold }}
+
 {{ . }}
 {{ end }}`
 	summaryTemplate = `
@@ -61,17 +61,17 @@ var (
  {{ "Private:" | bold }} {{ .PrivateKey | bold | green }}
  {{ "Public:" | bold }} {{ .PublicKey | bold | green }}
 `
-	listTemplate = `
-{{ range .Files }}
+	listTemplate = `{{ range .Files }}
 {{ divider | bold }}
  {{ "File" | bold }} {{ .Path | bold | green  }}
-{{ divider | bold }}
-{{ range .Sections }}
+{{ divider | bold }}{{ $l := len .Sections }}
+{{ if eq $l 0 }}
+ No sections have been defined in this file
+{{ else }}{{ range .Sections }}
  {{ .Type | bold }} {{ .Matching | green | bold }}
 {{ range $key, $value := .Configs }}
      {{ $key | bold }} {{ $value | green | bold }}{{ end }}
-{{ end }}
-{{ end }}`
+{{ end }}{{ end }}{{ end }}`
 )
 
 var templates = map[string]string{

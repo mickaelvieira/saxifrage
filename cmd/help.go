@@ -15,7 +15,7 @@ func runHelp(a *App) error {
 func help() *command {
 	return &command{
 		Name:   "help",
-		Usage:  "Show usage",
+		Usage:  "Show this help",
 		Action: runHelp,
 	}
 }

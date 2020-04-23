@@ -35,7 +35,7 @@ func runDump(a *App) error {
 func dump() *command {
 	return &command{
 		Name:   "dump",
-		Usage:  "Dump your ssh configuration",
+		Usage:  "Dump your SSH configuration",
 		Action: runDump,
 	}
 }

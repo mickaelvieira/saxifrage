@@ -112,8 +112,8 @@ func runGenerate(a *App) error {
 // generate creates the dump command
 func generate() *command {
 	return &command{
-		Name:   "generate",
-		Usage:  "Generate an SSH key",
+		Name:   "gen",
+		Usage:  "Generate interactively a SSH key",
 		Action: runGenerate,
 	}
 }
