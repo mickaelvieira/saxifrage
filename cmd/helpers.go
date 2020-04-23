@@ -4,10 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+
+	"github.com/mickaelvieira/saxifrage/template"
 )
 
 func askConfirm(t string) (c bool) {
-	fmt.Printf("%s: (y/N) ", t)
+	fn := template.Styler(template.FGBold)
+	fmt.Printf(fn(" %s: (y/N) "), t)
 
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
@@ -26,20 +29,12 @@ func askConfirm(t string) (c bool) {
 }
 
 func readInput(t string) (i string) {
-	fmt.Printf("%s\n", t)
+	fn := template.Styler(template.FGBold)
+	fmt.Printf(fn(" %s\n "), t)
 
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
 		i = s.Text()
-		// r, w := utf8.DecodeRuneInString(i)
-
-		// log.Println(r == '\n')
-		// log.Println(w)
-
-		// log.Println(i == "\n")
-		// log.Println(i == " ")
-		// log.Println(i == "")
-		// log.Printf("'%s'", i)
 		break
 	}
 

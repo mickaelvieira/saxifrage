@@ -1,22 +1,13 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/mickaelvieira/saxifrage/config"
-	"github.com/mickaelvieira/saxifrage/formatter"
 	"github.com/mickaelvieira/saxifrage/parser"
+	"github.com/mickaelvieira/saxifrage/template"
 	"github.com/urfave/cli/v2"
 )
 
 func runList(ctx *cli.Context) error {
-
-	t, err := askForKeyType()
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(t)
 	gc, err := parser.ParseFile(config.GetGlobalConfigPath())
 	if err != nil {
 		return err
@@ -27,8 +18,18 @@ func runList(ctx *cli.Context) error {
 		return err
 	}
 
-	formatter.List(gc)
-	formatter.List(uc)
+	f := []*config.File{gc, uc}
+	d := struct {
+		Files []*config.File
+	}{
+		Files: f,
+	}
+
+	t := template.NewRenderer()
+	err = t.Render("list", d)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -1,0 +1,10 @@
+{{ range .Files }}
+{{ divider | bold }}
+ {{ "File" | bold }} {{ .Path | bold | green  }}
+{{ divider | bold }}
+{{ range .Sections }}
+ {{ .Type | bold }} {{ .Matching | green | bold }}
+{{ range $key, $value := .Configs }}
+     {{ $key | bold }} {{ $value | green | bold }}{{ end }}
+{{ end }}
+{{ end }}

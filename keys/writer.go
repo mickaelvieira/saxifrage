@@ -7,20 +7,20 @@ import (
 	"path/filepath"
 )
 
-// GetDefaultFilenames returns a pair of string based on the type of key
+// GetFilenamesFromType returns a pair of string based on the type of key
 // The first value is the name of the private key
 // The second value is the name of the public key
-func GetDefaultFilenames(t Type) (pk string, pub string) {
+func GetFilenamesFromType(t Type) (pk string, pub string) {
 	pk = fmt.Sprintf("id_%s", string(t))
 	pub = fmt.Sprintf("%s.pub", pk)
 	return pk, pub
 }
 
-// GetUserFilenames returns a pair of string based on user's input
+// GetFilenamesFromString returns a pair of string based on user's input
 // The first value is the name of the private key
 // The second value is the name of the public key
-func GetUserFilenames(t string) (pk string, pub string) {
-	pk = fmt.Sprintf("%s", string(t))
+func GetFilenamesFromString(s string) (pk string, pub string) {
+	pk = fmt.Sprintf("%s", string(s))
 	pub = fmt.Sprintf("%s.pub", pk)
 	return pk, pub
 }

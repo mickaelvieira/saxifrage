@@ -6,17 +6,25 @@ import (
 
 	"github.com/mickaelvieira/saxifrage/keys"
 	"github.com/mickaelvieira/saxifrage/keys/genrsa"
+	"github.com/mickaelvieira/saxifrage/template"
 	"github.com/urfave/cli/v2"
 )
 
+var (
+	msgConfirmContinue = `Do you want to continue?`
+	msgConfirmKeyType  = `Enter the type of key you want to generate %s (default: %s)? `
+	msgConfirmDir      = `Enter the subdirectory (default: %s): `
+	msgConfirmFilename = `Enter the file name (default: %s): `
+)
+
 func askForKeyType() (keys.Type, error) {
+	f := template.Styler(template.FGBold, template.FGGreen)
 	t := keys.GetDefaultType()
 	s := keys.TypesToString()
-	m := fmt.Sprintf("Enter the type of key you want to generate %s (default: %s)?", s, string(t))
-	c := readInput(m)
+	i := readInput(fmt.Sprintf(msgConfirmKeyType, s, f(string(t))))
 
-	if c != "" {
-		t = keys.GetKeyType(c)
+	if i != "" {
+		t = keys.GetKeyType(i)
 		if t == keys.INVALID {
 			return t, keys.ErrInvalidKeyType
 		}
@@ -28,14 +36,16 @@ func askForKeyType() (keys.Type, error) {
 }
 
 func askForDirectory() string {
+	f := template.Styler(template.FGBold, template.FGGreen)
 	s := keys.GetDir("")
-	m := fmt.Sprintf("Enter the subdirectory (default: %s): ", s)
+	m := fmt.Sprintf(msgConfirmDir, f(s))
 	return readInput(m)
 }
 
 func askForFilename(t keys.Type) string {
-	s, _ := keys.GetDefaultFilenames(t)
-	m := fmt.Sprintf("Enter the file name (default: %s) :", s)
+	f := template.Styler(template.FGBold, template.FGGreen)
+	s, _ := keys.GetFilenamesFromType(t)
+	m := fmt.Sprintf(msgConfirmFilename, f(s))
 	return readInput(m)
 }
 
@@ -51,16 +61,31 @@ func runGenerate(ctx *cli.Context) error {
 	fn := askForFilename(t)
 	dp := keys.GetDir(dn)
 
-	fn1, fn2 := keys.GetDefaultFilenames(t)
+	fn1, fn2 := keys.GetFilenamesFromType(t)
 	if fn != "" {
-		fn1, fn2 = keys.GetUserFilenames(fn)
+		fn1, fn2 = keys.GetFilenamesFromString(fn)
 	}
 
 	p1 := filepath.Join(dp, fn1)
 	p2 := filepath.Join(dp, fn2)
 
-	fmt.Printf("You are about to create the following key\nType: %s\nPrivate: %s\nPublic: %s\n", string(t), p1, p2)
-	c := askConfirm("Do you want to continue?")
+	d := struct {
+		Type       string
+		PrivateKey string
+		PublicKey  string
+	}{
+		Type:       string(t),
+		PrivateKey: p1,
+		PublicKey:  p2,
+	}
+
+	r := template.NewRenderer()
+	err = r.Render("keys_summary", d)
+	if err != nil {
+		return err
+	}
+
+	c := askConfirm(msgConfirmContinue)
 
 	if c {
 		g := genrsa.New(4096)

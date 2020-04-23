@@ -1,10 +1,11 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 
 	"github.com/mickaelvieira/saxifrage/cmd"
+	"github.com/mickaelvieira/saxifrage/template"
 	"github.com/urfave/cli/v2"
 )
 
@@ -21,6 +22,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		fn := template.Styler(template.FGBold, template.FGRed)
+		fmt.Printf("\n %s\n", fn(err))
 	}
 }

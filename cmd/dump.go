@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/mickaelvieira/saxifrage/config"
 	"github.com/mickaelvieira/saxifrage/parser"
+	"github.com/mickaelvieira/saxifrage/template"
 	"github.com/urfave/cli/v2"
 )
 
@@ -14,16 +13,23 @@ func runDump(ctx *cli.Context) error {
 		return err
 	}
 
-	fmt.Printf("\nFile: %s\n\n", gc.Path)
-	fmt.Printf("%s", gc)
-
 	uc, err := parser.ParseFile(config.GetUserConfigPath())
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("\nFile: %s\n\n", uc.Path)
-	fmt.Printf("%s", uc)
+	f := []*config.File{gc, uc}
+	d := struct {
+		Files []*config.File
+	}{
+		Files: f,
+	}
+
+	t := template.NewRenderer()
+	err = t.Render("dump", d)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

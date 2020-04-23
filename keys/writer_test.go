@@ -41,7 +41,7 @@ func TestDefaultFilenames(t *testing.T) {
 
 	for i, tt := range cases {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got1, got2 := GetDefaultFilenames(tt.input1)
+			got1, got2 := GetFilenamesFromType(tt.input1)
 			if got1 != tt.want1 {
 				t.Errorf("want '%s', got '%s'", tt.want1, got1)
 			}
@@ -63,7 +63,7 @@ func TestUserFilenames(t *testing.T) {
 
 	for i, tt := range cases {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got1, got2 := GetUserFilenames(tt.input1)
+			got1, got2 := GetFilenamesFromString(tt.input1)
 			if got1 != tt.want1 {
 				t.Errorf("want '%s', got '%s'", tt.want1, got1)
 			}

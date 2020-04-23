@@ -1,0 +1,6 @@
+{{ range .Files }}
+{{ divider | bold }}
+ {{ "File" | bold }} {{ .Path | bold | green  }}
+{{ divider | bold }}
+{{ . }}
+{{ end }}
