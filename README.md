@@ -1,15 +1,25 @@
 # Saxifrage
 
+![Saxifrage](https://github.com/mickaelvieira/saxifrage/workflows/Saxifrage/badge.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/mickaelvieira/saxifrage)](https://goreportcard.com/report/github.com/mickaelvieira/saxifrage)
+
 A CLI tool to manage your SSH keys
 
+## Install
+
 ```sh
-$ sax help
+go get github.com/mickaelvieira/saxifrage
+```
+
+## Usage
+
+```sh
+$ saxifrage help
 
  NAME:
-  sax - Manage your ssh_config
+  saxifrage - Manage your ssh_config
 
  USAGE:
-  sax [command]
+  saxifrage [command]
 
  COMMANDS:
 
@@ -18,3 +28,4 @@ $ sax help
   dump         Dump your SSH configuration
   help         Show this help
 ```
+
