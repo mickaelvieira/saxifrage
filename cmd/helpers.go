@@ -30,7 +30,7 @@ func askConfirm(t string) (c bool) {
 
 func readInput(t string) (i string) {
 	fn := template.Styler(template.FGBold)
-	fmt.Printf(fn(" %s\n "), t)
+	fmt.Printf(fn(" %s "), t)
 
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {

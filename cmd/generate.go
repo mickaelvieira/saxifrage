@@ -7,14 +7,13 @@ import (
 	"github.com/mickaelvieira/saxifrage/keys"
 	"github.com/mickaelvieira/saxifrage/keys/genrsa"
 	"github.com/mickaelvieira/saxifrage/template"
-	"github.com/urfave/cli/v2"
 )
 
 var (
 	msgConfirmContinue = `Do you want to continue?`
-	msgConfirmKeyType  = `Enter the type of key you want to generate %s (default: %s)? `
-	msgConfirmDir      = `Enter the subdirectory (default: %s): `
-	msgConfirmFilename = `Enter the file name (default: %s): `
+	msgConfirmKeyType  = `Enter the type of key you want to generate %s (default: %s)?`
+	msgConfirmDir      = `Enter the subdirectory (default: %s):`
+	msgConfirmFilename = `Enter the file name (default: %s):`
 )
 
 func askForKeyType() (keys.Type, error) {
@@ -49,7 +48,7 @@ func askForFilename(t keys.Type) string {
 	return readInput(m)
 }
 
-func runGenerate(ctx *cli.Context) error {
+func runGenerate(a *App) error {
 	fmt.Println("Generating SSH keys...")
 
 	t, err := askForKeyType()
@@ -79,9 +78,7 @@ func runGenerate(ctx *cli.Context) error {
 		PublicKey:  p2,
 	}
 
-	r := template.NewRenderer()
-	err = r.Render("keys_summary", d)
-	if err != nil {
+	if err := template.Render("summary", d); err != nil {
 		return err
 	}
 
@@ -112,9 +109,9 @@ func runGenerate(ctx *cli.Context) error {
 	return nil
 }
 
-// Generate creates the dump command
-func Generate() *cli.Command {
-	return &cli.Command{
+// generate creates the dump command
+func generate() *command {
+	return &command{
 		Name:   "generate",
 		Usage:  "Generate an SSH key",
 		Action: runGenerate,

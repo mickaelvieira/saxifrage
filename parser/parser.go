@@ -11,13 +11,13 @@ import (
 
 // Parser --
 type Parser struct {
-	Tokens []*lexer.Token    // all the tokens received from the lexer
 	tokens chan *lexer.Token // shared channel, I need to find a better name
 	lexer  *lexer.Lexer      // our lexer to perform the lexical analysis
 }
 
 // Parse --
-func (p *Parser) Parse() (config.Sections, error) {
+func (p *Parser) Parse() (config.Sections, []*lexer.Token, error) {
+	var tokens []*lexer.Token
 	var sections config.Sections
 	var keyword string
 	var section config.SectionType
@@ -25,10 +25,10 @@ func (p *Parser) Parse() (config.Sections, error) {
 	go p.lexer.Lex()
 
 	for t := range p.tokens {
-		p.Tokens = append(p.Tokens, t)
+		tokens = append(tokens, t)
 	}
 
-	for _, t := range p.Tokens {
+	for _, t := range tokens {
 		if !t.IsComment() && !t.IsEOF() && !t.IsEOL() && !t.IsWhitespace() {
 			switch {
 			case t.IsSection():
@@ -46,18 +46,18 @@ func (p *Parser) Parse() (config.Sections, error) {
 				sections[idx].Configs[keyword] = t.Value
 				keyword = ""
 			case keyword != "" && !t.IsValue():
-				return sections, fmt.Errorf(MsgMissingKeywordValue, keyword)
+				return sections, tokens, fmt.Errorf(MsgMissingKeywordValue, keyword)
 			case section != "" && !t.IsValue():
-				return sections, fmt.Errorf(MsgMissingSectionValue, section)
+				return sections, tokens, fmt.Errorf(MsgMissingSectionValue, section)
 			case t.IsError():
-				return sections, fmt.Errorf(MsgLexerError, t.Value)
+				return sections, tokens, fmt.Errorf(MsgLexerError, t.Value)
 			default:
-				return sections, fmt.Errorf(MsgUnexpectedToken)
+				return sections, tokens, fmt.Errorf(MsgUnexpectedToken)
 			}
 		}
 	}
 
-	return sections, nil
+	return sections, tokens, nil
 }
 
 // New creates a new parser
@@ -87,10 +87,10 @@ func ParseFile(path string) (*config.File, error) {
 	}
 	p := New(string(c))
 
-	s, err := p.Parse()
+	s, t, err := p.Parse()
 	if err != nil {
 		return nil, err
 	}
 
-	return &config.File{Path: path, Sections: s, Tokens: p.Tokens}, nil
+	return &config.File{Path: path, Sections: s, Tokens: t}, nil
 }

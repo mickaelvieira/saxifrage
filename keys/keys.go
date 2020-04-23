@@ -50,3 +50,10 @@ func GetKeyType(i string) Type {
 	}
 	return INVALID
 }
+
+// type Options struct {
+// 	Type       Type
+// 	PrivateKey string
+// 	PublicKey  string
+// 	Directory  string
+// }

@@ -4,10 +4,9 @@ import (
 	"github.com/mickaelvieira/saxifrage/config"
 	"github.com/mickaelvieira/saxifrage/parser"
 	"github.com/mickaelvieira/saxifrage/template"
-	"github.com/urfave/cli/v2"
 )
 
-func runDump(ctx *cli.Context) error {
+func runDump(a *App) error {
 	gc, err := parser.ParseFile(config.GetGlobalConfigPath())
 	if err != nil {
 		return err
@@ -25,18 +24,16 @@ func runDump(ctx *cli.Context) error {
 		Files: f,
 	}
 
-	t := template.NewRenderer()
-	err = t.Render("dump", d)
-	if err != nil {
+	if err := template.Render("dump", d); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// Dump creates the dump command
-func Dump() *cli.Command {
-	return &cli.Command{
+// dump creates the dump command
+func dump() *command {
+	return &command{
 		Name:   "dump",
 		Usage:  "Dump your ssh configuration",
 		Action: runDump,

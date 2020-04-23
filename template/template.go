@@ -11,8 +11,8 @@ func Divider() string {
 	return fmt.Sprintf("=====================================================")
 }
 
-// funcMap defines template helpers
-var funcMap = template.FuncMap{
+// fn defines template helpers
+var fn = template.FuncMap{
 	"black":     Styler(FGBlack),
 	"red":       Styler(FGRed),
 	"green":     Styler(FGGreen),
@@ -36,19 +36,65 @@ var funcMap = template.FuncMap{
 	"divider":   Divider,
 }
 
-// Templates templates renderer
-type Templates struct {
-	templates *template.Template
+var (
+	helpTemplate = `
+ NAME:
+  {{ .Name }} - {{ .Usage }}
+
+ USAGE:
+  {{ .Name }} [command]
+
+ COMMANDS:
+{{ range .Commands}}
+  {{ .Name }}         {{ .Usage }}{{ end }}
+`
+	dumpTemplate = `
+{{ range .Files }}
+{{ divider | bold }}
+	{{ "File" | bold }} {{ .Path | bold | green  }}
+{{ divider | bold }}
+{{ . }}
+{{ end }}`
+	summaryTemplate = `
+ {{ "You are about to create the following SSH key" | bold }}
+ {{ "Type:" | bold }} {{ .Type | bold | green }}
+ {{ "Private:" | bold }} {{ .PrivateKey | bold | green }}
+ {{ "Public:" | bold }} {{ .PublicKey | bold | green }}
+`
+	listTemplate = `
+{{ range .Files }}
+{{ divider | bold }}
+ {{ "File" | bold }} {{ .Path | bold | green  }}
+{{ divider | bold }}
+{{ range .Sections }}
+ {{ .Type | bold }} {{ .Matching | green | bold }}
+{{ range $key, $value := .Configs }}
+     {{ $key | bold }} {{ $value | green | bold }}{{ end }}
+{{ end }}
+{{ end }}`
+)
+
+var templates = map[string]string{
+	"dump":    dumpTemplate,
+	"help":    helpTemplate,
+	"summary": summaryTemplate,
+	"list":    listTemplate,
 }
 
-// Render renders corresponding to the name provided with data
-func (r *Templates) Render(name string, data interface{}) error {
-	return r.templates.ExecuteTemplate(os.Stdout, fmt.Sprintf("%s.tmpl", name), data)
-}
-
-// NewRenderer creates a new renderer
-func NewRenderer() *Templates {
-	return &Templates{
-		templates: template.Must(template.New("html-tmpl").Funcs(funcMap).ParseGlob("./template/tmpl/*.tmpl")),
+// Render renders the template corresponding to the name with the provided data
+func Render(n string, d interface{}) error {
+	s, ok := templates[n]
+	if !ok {
+		return fmt.Errorf("Template '%s' does not exist", n)
 	}
+
+	t, err := template.New(n).Funcs(fn).Parse(s)
+	if err != nil {
+		return err
+	}
+
+	if err := t.Execute(os.Stdout, d); err != nil {
+		return err
+	}
+	return nil
 }
