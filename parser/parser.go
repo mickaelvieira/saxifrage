@@ -94,3 +94,23 @@ func ParseFile(path string) (*config.File, error) {
 
 	return &config.File{Path: path, Sections: s, Tokens: t}, nil
 }
+
+// ParseFiles parses configuration files
+func ParseFiles() ([]*config.File, error) {
+	f := make([]*config.File, 2)
+
+	gc, err := ParseFile(config.GetGlobalConfigPath())
+	if err != nil {
+		return f, err
+	}
+
+	uc, err := ParseFile(config.GetUserConfigPath())
+	if err != nil {
+		return f, err
+	}
+
+	f[0] = gc
+	f[1] = uc
+
+	return f, nil
+}

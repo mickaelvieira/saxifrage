@@ -7,21 +7,15 @@ import (
 )
 
 func runDump(a *App) error {
-	gc, err := parser.ParseFile(config.GetGlobalConfigPath())
+	files, err := parser.ParseFiles()
 	if err != nil {
 		return err
 	}
 
-	uc, err := parser.ParseFile(config.GetUserConfigPath())
-	if err != nil {
-		return err
-	}
-
-	f := []*config.File{gc, uc}
 	d := struct {
 		Files []*config.File
 	}{
-		Files: f,
+		Files: files,
 	}
 
 	if err := template.Render("dump", d); err != nil {
