@@ -10,7 +10,7 @@ import (
 
 func askConfirm(t string) (c bool) {
 	fn := template.Styler(template.FGBold)
-	fmt.Printf(fn(" %s: (y/N) "), t)
+	fmt.Printf(fn(" %s (y/N) "), t)
 
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {

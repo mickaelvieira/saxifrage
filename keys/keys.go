@@ -49,6 +49,7 @@ var (
 	ErrInvalidKeyType         = errors.New("Invalid key type. Type should be equal to rsa, dsa, ecdsa or ed25519")
 	ErrPrivateKeyNotGenerated = errors.New("Private key must be generated before generating the public key")
 	ErrBitSizeNotSpecified    = errors.New("bitsize value was not set")
+	ErrKeyOverrideNotAllowed  = errors.New("Overriding the key is not allowed")
 )
 
 // GetKeyType retrieves key type from user's input

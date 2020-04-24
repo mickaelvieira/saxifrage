@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/mickaelvieira/saxifrage/keys"
@@ -9,10 +10,11 @@ import (
 )
 
 var (
-	msgConfirmContinue = `Do you want to continue?`
-	msgConfirmKeyType  = `Enter the type of key you want to generate %s (default: %s)?`
-	msgConfirmDir      = `Enter the subdirectory (default: %s):`
-	msgConfirmFilename = `Enter the file name (default: %s):`
+	msgConfirmOverride = "The key already exists. Do you want to override it?"
+	msgConfirmContinue = "Do you want to continue?"
+	msgConfirmKeyType  = "Enter the type of key you want to generate %s (default: %s)?"
+	msgConfirmDir      = "Enter the subdirectory (default: %s):"
+	msgConfirmFilename = "Enter the file name (default: %s):"
 )
 
 func askForKeyType() (keys.Type, error) {
@@ -30,6 +32,11 @@ func askForKeyType() (keys.Type, error) {
 	return t, nil
 }
 
+func msg(m string) {
+	f := template.Styler(template.FGBold, template.FGGreen)
+	fmt.Printf(" %s\n", f(m))
+}
+
 func askForDirectory() string {
 	f := template.Styler(template.FGBold, template.FGGreen)
 	s := keys.GetDir("")
@@ -45,18 +52,12 @@ func askForFilename(t keys.Type) string {
 }
 
 func runGenerate(a *App) error {
-	fmt.Println("Generating SSH keys...")
-
 	t, err := askForKeyType()
 	if err != nil {
 		return err
 	}
 
 	dn := askForDirectory()
-	if dn == "" {
-		dn = "testing-directory"
-	}
-
 	fn := askForFilename(t)
 	dp := keys.GetDir(dn)
 
@@ -85,6 +86,16 @@ func runGenerate(a *App) error {
 	c := askConfirm(msgConfirmContinue)
 
 	if c {
+		// make sure we don't override an exiting key
+		if _, err := os.Stat(p1); err == nil {
+			o := askConfirm(msgConfirmOverride)
+			if !o {
+				return keys.ErrKeyOverrideNotAllowed
+			}
+		}
+
+		msg("Generating SSH keys...")
+
 		g := keys.GetGenerator(t)
 
 		privateKey, err := g.GenPrivateKey()
@@ -104,6 +115,8 @@ func runGenerate(a *App) error {
 		if err := keys.WriteToFile(publicKey, p2); err != nil {
 			return err
 		}
+
+		msg("The SSH keys were generated successfully!")
 	}
 
 	return nil
