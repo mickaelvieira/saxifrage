@@ -1,7 +1,16 @@
 package keys
 
 import (
+	"crypto"
+	"crypto/dsa"
+	"crypto/ecdsa"
+	"crypto/ed25519"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/asn1"
+	"encoding/pem"
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -39,6 +48,7 @@ var (
 	ErrNotImplementedKeyType  = errors.New("This type of key is not yet implemented")
 	ErrInvalidKeyType         = errors.New("Invalid key type. Type should be equal to rsa, dsa, ecdsa or ed25519")
 	ErrPrivateKeyNotGenerated = errors.New("Private key must be generated before generating the public key")
+	ErrBitSizeNotSpecified    = errors.New("bitsize value was not set")
 )
 
 // GetKeyType retrieves key type from user's input
@@ -49,6 +59,53 @@ func GetKeyType(i string) Type {
 		}
 	}
 	return INVALID
+}
+
+// EncodeToPEM ...
+// https://golang.org/pkg/encoding/pem/#Block
+func EncodeToPEM(privateKey crypto.PrivateKey) ([]byte, error) {
+	var der []byte
+	var blk *pem.Block
+
+	switch sk := privateKey.(type) {
+	case *rsa.PrivateKey:
+		der = x509.MarshalPKCS1PrivateKey(sk)
+		blk = &pem.Block{
+			Type:  "RSA PRIVATE KEY",
+			Bytes: der,
+		}
+	case *ecdsa.PrivateKey:
+		der, err := x509.MarshalECPrivateKey(sk)
+		if err != nil {
+			return nil, err
+		}
+		blk = &pem.Block{
+			Type:  "EC PRIVATE KEY",
+			Bytes: der,
+		}
+	case *dsa.PrivateKey:
+		der, err := asn1.Marshal(sk.PublicKey)
+		if err != nil {
+			return nil, err
+		}
+		blk = &pem.Block{
+			Type:  "PUBLIC KEY",
+			Bytes: der,
+		}
+	case ed25519.PrivateKey:
+		der, err := x509.MarshalPKCS8PrivateKey(sk)
+		if err != nil {
+			return nil, err
+		}
+		blk = &pem.Block{
+			Type:  "OPENSSH PRIVATE KEY",
+			Bytes: der,
+		}
+	default:
+		return nil, fmt.Errorf("Invalid KEY type %v", sk)
+	}
+
+	return pem.EncodeToMemory(blk), nil
 }
 
 // type Options struct {

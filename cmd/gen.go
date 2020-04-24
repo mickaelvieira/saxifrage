@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"github.com/mickaelvieira/saxifrage/keys"
-	"github.com/mickaelvieira/saxifrage/keys/genrsa"
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
@@ -27,9 +26,6 @@ func askForKeyType() (keys.Type, error) {
 		if t == keys.INVALID {
 			return t, keys.ErrInvalidKeyType
 		}
-	}
-	if t != keys.RSA {
-		return t, keys.ErrNotImplementedKeyType
 	}
 	return t, nil
 }
@@ -57,6 +53,10 @@ func runGenerate(a *App) error {
 	}
 
 	dn := askForDirectory()
+	if dn == "" {
+		dn = "testing-directory"
+	}
+
 	fn := askForFilename(t)
 	dp := keys.GetDir(dn)
 
@@ -85,7 +85,7 @@ func runGenerate(a *App) error {
 	c := askConfirm(msgConfirmContinue)
 
 	if c {
-		g := genrsa.New(4096)
+		g := keys.GetGenerator(t)
 
 		privateKey, err := g.GenPrivateKey()
 		if err != nil {
