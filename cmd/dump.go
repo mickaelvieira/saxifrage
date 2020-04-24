@@ -24,12 +24,3 @@ func runDump(a *App) error {
 
 	return nil
 }
-
-// dump creates the dump command
-func dump() *command {
-	return &command{
-		Name:   "dump",
-		Usage:  "Dump your SSH configuration",
-		Action: runDump,
-	}
-}

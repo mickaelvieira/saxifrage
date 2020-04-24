@@ -10,7 +10,7 @@ run:
 	go run sax.go
 
 build:
-	go build -o sax
+	go build
 
 test:
 	go test ./...

@@ -39,14 +39,14 @@ var fn = template.FuncMap{
 var (
 	helpTemplate = `
  NAME:
-  {{ .Name }} - {{ .Usage }}
+  {{ .AppName }} - {{ .AppUsage }}
 
  USAGE:
-  {{ .Name }} [command]
+  {{ .AppName }} [command]
 
  COMMANDS:
-{{ range .Commands}}
-  {{ .Name }}         {{ .Usage }}{{ end }}
+{{ range $name, $usage := .Commands}}
+  {{ $name }}    {{ $usage }}{{ end }}
 `
 	dumpTemplate = `{{ range .Files }}
 {{ divider | bold }}

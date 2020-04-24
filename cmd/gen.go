@@ -51,7 +51,7 @@ func askForFilename(t keys.Type) string {
 	return readInput(m)
 }
 
-func runGenerate(a *App) error {
+func runGen(a *App) error {
 	t, err := askForKeyType()
 	if err != nil {
 		return err
@@ -120,14 +120,4 @@ func runGenerate(a *App) error {
 	}
 
 	return nil
-}
-
-// generate creates the dump command
-func generate() *command {
-	u := fmt.Sprintf("Generate interactively a SSH key (%s)", keys.TypesToString())
-	return &command{
-		Name:   "gen",
-		Usage:  u,
-		Action: runGenerate,
-	}
 }

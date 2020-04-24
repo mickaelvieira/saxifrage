@@ -16,16 +16,16 @@ go get github.com/mickaelvieira/saxifrage
 $ saxifrage
 
  NAME:
-  saxifrage - Manage your ssh_config
+  saxifrage - A CLI tool to manage your SSH keys
 
  USAGE:
   saxifrage [command]
 
  COMMANDS:
 
-  gen          Generate interactively a SSH key (rsa, dsa, ecdsa, ed25519)
-  show         Show your SSH configuration
-  dump         Dump your SSH configuration
-  help         Show this help
+  config    Show your SSH configuration
+  dump      Dump your SSH configuration
+  gen       Generate interactively a SSH key (rsa, dsa, ecdsa, ed25519)
+  help      Show this help
 ```
 

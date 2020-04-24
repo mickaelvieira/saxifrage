@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/mickaelvieira/saxifrage/keys"
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
@@ -59,14 +60,14 @@ func (a *App) find(name string) *command {
 // New creates a new application
 func New() *App {
 	a := &App{
-		Usage: "Manage your ssh_config",
+		Usage: "A CLI tool to manage your SSH keys",
 	}
 
 	a.Commands = make([]*command, 4)
-	a.Commands[0] = generate()
-	a.Commands[1] = list()
-	a.Commands[2] = dump()
-	a.Commands[3] = help()
+	a.Commands[0] = &command{Name: "gen", Usage: fmt.Sprintf("Generate interactively a SSH key (%s)", keys.TypesToString()), Action: runGen}
+	a.Commands[1] = &command{Name: "config", Usage: "Show your SSH configuration", Action: runConfig}
+	a.Commands[2] = &command{Name: "dump", Usage: "Dump your SSH configuration", Action: runDump}
+	a.Commands[3] = &command{Name: "help", Usage: "Show this help", Action: runHelp}
 
 	return a
 }

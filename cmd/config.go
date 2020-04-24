@@ -6,7 +6,7 @@ import (
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
-func runList(a *App) error {
+func runConfig(a *App) error {
 	files, err := parser.ParseFiles()
 	if err != nil {
 		return err
@@ -23,13 +23,4 @@ func runList(a *App) error {
 	}
 
 	return nil
-}
-
-// list creates the list command
-func list() *command {
-	return &command{
-		Name:   "show",
-		Usage:  "Show your SSH configuration",
-		Action: runList,
-	}
 }
