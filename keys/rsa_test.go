@@ -6,25 +6,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGenPrivateKeyNoBitSize(t *testing.T) {
+func TestRSAGenPrivateKeyNoBitSize(t *testing.T) {
 	gen := &RSAGenerator{}
 	_, err := gen.GenPrivateKey()
 	assert.Equal(t, ErrBitSizeNotSpecified, err)
 }
 
-func TestGenPrivateKey(t *testing.T) {
+func TestRSAGenPrivateKey(t *testing.T) {
 	gen := &RSAGenerator{bitSize: 64}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)
 }
 
-func TestGenPublicKeyWithoutPrivateKey(t *testing.T) {
+func TestRSAGenPublicKeyWithoutPrivateKey(t *testing.T) {
 	gen := &RSAGenerator{}
 	_, err := gen.GenPublicKey()
 	assert.Equal(t, ErrPrivateKeyNotGenerated, err)
 }
 
-func TestGenPublicKey(t *testing.T) {
+func TestRSAGenPublicKey(t *testing.T) {
 	gen := &RSAGenerator{bitSize: 64}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)

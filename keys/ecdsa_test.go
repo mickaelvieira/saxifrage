@@ -6,25 +6,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func TestGenPrivateKeyNoBitSize(t *testing.T) {
-// 	gen := &ECDSAGenerator{}
-// 	_, err := gen.GenPrivateKey()
-// 	assert.Equal(t, ErrBitSizeNotSpecified, err)
-// }
-
-func TestGenPrivateKey(t *testing.T) {
+func TestECDSAGenPrivateKey(t *testing.T) {
 	gen := &ECDSAGenerator{}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)
 }
 
-func TestGenPublicKeyWithoutPrivateKey(t *testing.T) {
+func TestECDSAGenPublicKeyWithoutPrivateKey(t *testing.T) {
 	gen := &ECDSAGenerator{}
 	_, err := gen.GenPublicKey()
 	assert.Equal(t, ErrPrivateKeyNotGenerated, err)
 }
 
-func TestGenPublicKey(t *testing.T) {
+func TestECDSAGenPublicKey(t *testing.T) {
 	gen := &ECDSAGenerator{}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)

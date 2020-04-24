@@ -6,6 +6,7 @@ type Generator interface {
 	GenPrivateKey() ([]byte, error)
 }
 
+// GetGenerator returns the generator matching the type of key
 func GetGenerator(t Type) Generator {
 	switch t {
 	case RSA:
