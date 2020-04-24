@@ -35,7 +35,7 @@ func (a *App) Run(args []string) error {
 
 	c := a.find(n)
 	if c == nil {
-		return fmt.Errorf("Command '%s' does not exist", args[0])
+		return fmt.Errorf("Command '%s' does not exist", n)
 	}
 
 	return c.Action(a)
