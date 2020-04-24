@@ -10,6 +10,18 @@ A CLI tool to manage your SSH keys
 go get github.com/mickaelvieira/saxifrage
 ```
 
+You can rename the binary if you prefer using a shorter command. Bear in mind that you will have to rename it after each update.
+
+```sh
+mv $(go env GOPATH)/bin/saxifrage $(go env GOPATH)/bin/sax
+```
+
+## Update
+
+```sh
+go get -u github.com/mickaelvieira/saxifrage
+```
+
 ## Usage
 
 ```sh
