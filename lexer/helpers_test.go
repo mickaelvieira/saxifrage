@@ -1,8 +1,9 @@
 package lexer
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestWhitespaces(t *testing.T) {
@@ -16,13 +17,9 @@ func TestWhitespaces(t *testing.T) {
 		{'\t', true},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got := isWhitespace(tt.input)
-			if got != tt.want {
-				t.Errorf("Failed for %v ...", tt.input)
-			}
-		})
+	for i, tc := range cases {
+		got := isWhitespace(tc.input)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -35,13 +32,9 @@ func TestHash(t *testing.T) {
 		{'#', true},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got := isHash(tt.input)
-			if got != tt.want {
-				t.Errorf("Failed for %v ...", tt.input)
-			}
-		})
+	for i, tc := range cases {
+		got := isHash(tc.input)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -55,13 +48,9 @@ func TestDoubleQuote(t *testing.T) {
 		{'"', true},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got := isDoubleQuote(tt.input)
-			if got != tt.want {
-				t.Errorf("Failed for %v ...", tt.input)
-			}
-		})
+	for i, tc := range cases {
+		got := isDoubleQuote(tc.input)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -74,13 +63,9 @@ func TestEOF(t *testing.T) {
 		{'\n', false},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got := isEOF(tt.input)
-			if got != tt.want {
-				t.Errorf("Failed for %v ...", tt.input)
-			}
-		})
+	for i, tc := range cases {
+		got := isEOF(tc.input)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -93,12 +78,8 @@ func TestEOL(t *testing.T) {
 		{'\n', true},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got := isEOL(tt.input)
-			if got != tt.want {
-				t.Errorf("Failed for %v ...", tt.input)
-			}
-		})
+	for i, tc := range cases {
+		got := isEOL(tc.input)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }

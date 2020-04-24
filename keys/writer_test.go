@@ -1,9 +1,10 @@
 package keys
 
 import (
-	"fmt"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var home = os.Getenv("HOME")
@@ -17,13 +18,9 @@ func TestDestinationDir(t *testing.T) {
 		{"foo", home + "/.ssh/foo"},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got := GetDir(tt.input)
-			if got != tt.want {
-				t.Errorf("want '%s', got '%s'", tt.want, got)
-			}
-		})
+	for i, tc := range cases {
+		got := GetDir(tc.input)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -39,16 +36,10 @@ func TestDefaultFilenames(t *testing.T) {
 		{ED25519, "id_ed25519", "id_ed25519.pub"},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got1, got2 := GetFilenamesFromType(tt.input1)
-			if got1 != tt.want1 {
-				t.Errorf("want '%s', got '%s'", tt.want1, got1)
-			}
-			if got2 != tt.want2 {
-				t.Errorf("want '%s', got '%s'", tt.want2, got2)
-			}
-		})
+	for i, tc := range cases {
+		got1, got2 := GetFilenamesFromType(tc.input1)
+		assert.Equal(t, tc.want1, got1, "Test case %d %v", i, tc)
+		assert.Equal(t, tc.want2, got2, "Test case %d %v", i, tc)
 	}
 }
 
@@ -61,15 +52,9 @@ func TestUserFilenames(t *testing.T) {
 		{"baz", "baz", "baz.pub"},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got1, got2 := GetFilenamesFromString(tt.input1)
-			if got1 != tt.want1 {
-				t.Errorf("want '%s', got '%s'", tt.want1, got1)
-			}
-			if got2 != tt.want2 {
-				t.Errorf("want '%s', got '%s'", tt.want2, got2)
-			}
-		})
+	for i, tc := range cases {
+		got1, got2 := GetFilenamesFromString(tc.input1)
+		assert.Equal(t, tc.want1, got1, "Test case %d %v", i, tc)
+		assert.Equal(t, tc.want2, got2, "Test case %d %v", i, tc)
 	}
 }

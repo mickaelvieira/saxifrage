@@ -1,78 +1,59 @@
 package lexer
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTokenIsSection(t *testing.T) {
 	token := &Token{Type: Section}
-	if !token.IsSection() {
-		t.Errorf("Failed for %v", token.Type)
-	}
+	assert.True(t, token.IsSection(), "Test Case %v", token.Type)
 }
 
 func TestTokenIsKeyword(t *testing.T) {
 	token := &Token{Type: Keyword}
-	if !token.IsKeyword() {
-		t.Errorf("Failed for %v", token.Type)
-	}
+	assert.True(t, token.IsKeyword(), "Test Case %v", token.Type)
 }
 
 func TestTokenIsWhitespace(t *testing.T) {
 	token := &Token{Type: Whitespace}
-	if !token.IsWhitespace() {
-		t.Errorf("Failed for %v", token.Type)
-	}
+	assert.True(t, token.IsWhitespace(), "Test Case %v", token.Type)
 }
 
 func TestTokenIsComment(t *testing.T) {
 	token := &Token{Type: Comment}
-	if !token.IsComment() {
-		t.Errorf("Failed for %v", token.Type)
-	}
+	assert.True(t, token.IsComment(), "Test Case %v", token.Type)
 }
 
 func TestTokenIsError(t *testing.T) {
 	token := &Token{Type: Err}
-	if !token.IsError() {
-		t.Errorf("Failed for %v", token.Type)
-	}
+	assert.True(t, token.IsError(), "Test Case %v", token.Type)
 }
 
 func TestTokenIsValue(t *testing.T) {
 	token := &Token{Type: Value}
-	if !token.IsValue() {
-		t.Errorf("Failed for %v", token.Type)
-	}
+	assert.True(t, token.IsValue(), "Test Case %v", token.Type)
 }
 
 func TestTokenIsEOL(t *testing.T) {
 	token := &Token{Type: EOL}
-	if !token.IsEOL() {
-		t.Errorf("Failed for %v", token.Type)
-	}
+	assert.True(t, token.IsEOL(), "Test Case %v", token.Type)
 }
 
 func TestTokenIsEOF(t *testing.T) {
 	token := &Token{Type: EOF}
-	if !token.IsEOF() {
-		t.Errorf("Failed for %v", token.Type)
-	}
+	assert.True(t, token.IsEOF(), "Test Case %v", token.Type)
 }
 
 func TestTokenIsHostSection(t *testing.T) {
 	token := &Token{Type: Section, Value: "Host"}
-	if !token.IsHostSection() {
-		t.Errorf("Failed for %v %v", token.Type, token.Value)
-	}
+	assert.True(t, token.IsHostSection(), "Test Case %v", token.Type)
 }
 
 func TestTokenIsMatchSection(t *testing.T) {
 	token := &Token{Type: Section, Value: "Match"}
-	if !token.IsMatchSection() {
-		t.Errorf("Failed for %v %v", token.Type, token.Value)
-	}
+	assert.True(t, token.IsMatchSection(), "Test Case %v", token.Type)
 }
 
 func TestStringConvertion(t *testing.T) {
@@ -86,13 +67,9 @@ func TestStringConvertion(t *testing.T) {
 		{" ", Whitespace, " "},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			token := Token{Value: tt.input, Type: tt.t}
-			got := token.String()
-			if got != tt.want {
-				t.Errorf("Want '%s', got '%s'", tt.want, got)
-			}
-		})
+	for i, tc := range cases {
+		token := Token{Value: tc.input, Type: tc.t}
+		got := token.String()
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }

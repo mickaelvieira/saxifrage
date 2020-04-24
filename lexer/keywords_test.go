@@ -1,8 +1,9 @@
 package lexer
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIsKeyword(t *testing.T) {
@@ -81,12 +82,8 @@ func TestIsKeyword(t *testing.T) {
 		{"VisualHostKey", true},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got := isKeyword(tt.input)
-			if got != tt.want {
-				t.Errorf("Failed for %v ...", tt.input)
-			}
-		})
+	for i, tc := range cases {
+		got := isKeyword(tc.input)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }

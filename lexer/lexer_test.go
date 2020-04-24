@@ -1,8 +1,9 @@
 package lexer
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNext(t *testing.T) {
@@ -23,13 +24,9 @@ func TestNext(t *testing.T) {
 
 	l := Lexer{input: "Hello, 世界"}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got := l.next()
-			if got != tt.want {
-				t.Errorf("Failed for %v", tt.want)
-			}
-		})
+	for i, tc := range cases {
+		got := l.next()
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -42,13 +39,9 @@ func TestNextEmptyString(t *testing.T) {
 
 	l := Lexer{}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			got := l.next()
-			if got != tt.want {
-				t.Errorf("Failed for %v", tt.want)
-			}
-		})
+	for i, tc := range cases {
+		got := l.next()
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -56,35 +49,26 @@ func TestRewind(t *testing.T) {
 	l := Lexer{input: "世界"}
 
 	got := l.next()
-	if got != '世' {
-		t.Errorf("Want %v got %v", '世', got)
-	}
+	assert.Equal(t, '世', got, "Runes don't match")
 
 	l.rewind()
 
 	got = l.next()
-	if got != '世' {
-		t.Errorf("Want %v got %v", '世', got)
-	}
+	assert.Equal(t, '世', got, "Runes don't match")
 }
 
 func TestPeek(t *testing.T) {
+
 	l := Lexer{input: "世界"}
 
 	got := l.next()
-	if got != '世' {
-		t.Errorf("Want %v got %v", '世', got)
-	}
+	assert.Equal(t, '世', got, "Runes don't match")
 
 	got = l.peek()
-	if got != '界' {
-		t.Errorf("Want %v got %v", '界', got)
-	}
+	assert.Equal(t, '界', got, "Runes don't match")
 
 	got = l.next()
-	if got != '界' {
-		t.Errorf("Want %v got %v", '界', got)
-	}
+	assert.Equal(t, '界', got, "Runes don't match")
 }
 
 func TestIgnoreWhitespaces(t *testing.T) {
@@ -98,18 +82,12 @@ func TestIgnoreWhitespaces(t *testing.T) {
 		{"	  a", 'a'},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			l := Lexer{input: tt.input}
-			ws := l.lexWhitespaces()
-			got := l.next()
-			if ws != " " {
-				t.Errorf("Want whitespace, got %v", ws)
-			}
-			if got != tt.want {
-				t.Errorf("Want %v, got %v", tt.want, got)
-			}
-		})
+	for i, tc := range cases {
+		l := Lexer{input: tc.input}
+		ws := l.lexWhitespaces()
+		got := l.next()
+		assert.Equal(t, " ", ws, "Test Case %d %v", i, tc)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -122,18 +100,12 @@ func TestComments(t *testing.T) {
 `, "# foo"},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			l := Lexer{input: tt.input}
-			got := l.lexComments()
-			e := l.next()
-			if got != tt.want {
-				t.Errorf("Want %s, got %s", string(tt.want), string(got))
-			}
-			if e != eol {
-				t.Errorf("Want eol, got %v", e)
-			}
-		})
+	for i, tc := range cases {
+		l := Lexer{input: tc.input}
+		got := l.lexComments()
+		e := l.next()
+		assert.Equal(t, eol, e, "Test Case %d %v", i, tc)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -146,14 +118,10 @@ func TestWord(t *testing.T) {
 		{"bar foo", "bar"},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			l := Lexer{input: tt.input}
-			got := l.lexWord()
-			if got != tt.want {
-				t.Errorf("Want %s, got %s", string(tt.want), string(got))
-			}
-		})
+	for i, tc := range cases {
+		l := Lexer{input: tc.input}
+		got := l.lexWord()
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -174,17 +142,11 @@ func TestValues(t *testing.T) {
 		{`"bar foo, baz`, "", ErrUnclosedQuote},
 	}
 
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			l := Lexer{input: tt.input}
-			got, err := l.lexValue()
-			if got != tt.want {
-				t.Errorf("Want '%s', got '%s'", string(tt.want), string(got))
-			}
-			if err != tt.err {
-				t.Errorf("Want %s, got %s", tt.err, err)
-			}
-		})
+	for i, tc := range cases {
+		l := Lexer{input: tc.input}
+		got, err := l.lexValue()
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
+		assert.Equal(t, err, tc.err, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -258,15 +220,9 @@ VerifyHostKeyDNS baz`}
 
 	var i int
 	for got := range tokens {
-		tt := cases[i]
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			if got.Type != tt.want.Type {
-				t.Errorf("Want %v got %v", tt.want.Type, got.Type)
-			}
-			if got.Value != tt.want.Value {
-				t.Errorf("Want %v got %v", tt.want.Value, got.Value)
-			}
-		})
+		tc := cases[i]
+		assert.Equal(t, tc.want.Type, got.Type, "Test Case %d %v", i, tc)
+		assert.Equal(t, tc.want.Value, got.Value, "Test Case %d %v", i, tc)
 		i++
 	}
 }
