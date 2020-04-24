@@ -124,9 +124,10 @@ func runGenerate(a *App) error {
 
 // generate creates the dump command
 func generate() *command {
+	u := fmt.Sprintf("Generate interactively a SSH key (%s)", keys.TypesToString())
 	return &command{
 		Name:   "gen",
-		Usage:  "Generate interactively a SSH key",
+		Usage:  u,
 		Action: runGenerate,
 	}
 }

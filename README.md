@@ -13,7 +13,7 @@ go get github.com/mickaelvieira/saxifrage
 ## Usage
 
 ```sh
-$ saxifrage help
+$ saxifrage
 
  NAME:
   saxifrage - Manage your ssh_config
@@ -23,7 +23,7 @@ $ saxifrage help
 
  COMMANDS:
 
-  gen          Generate interactively a SSH key
+  gen          Generate interactively a SSH key (rsa, dsa, ecdsa, ed25519)
   show         Show your SSH configuration
   dump         Dump your SSH configuration
   help         Show this help
