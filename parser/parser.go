@@ -29,7 +29,7 @@ func (p *Parser) Parse() (config.Sections, []*lexer.Token, error) {
 	}
 
 	for _, t := range tokens {
-		if !t.IsComment() && !t.IsEOF() && !t.IsEOL() && !t.IsWhitespace() {
+		if !t.IsComment() && !t.IsEOF() && !t.IsEOL() && !t.IsWhitespace() && !t.IsSeparator() {
 			switch {
 			case t.IsSection():
 				section = config.HostType
@@ -51,6 +51,8 @@ func (p *Parser) Parse() (config.Sections, []*lexer.Token, error) {
 				return sections, tokens, fmt.Errorf(MsgMissingSectionValue, section)
 			case t.IsError():
 				return sections, tokens, fmt.Errorf(MsgLexerError, t.Value)
+			case t.IsIllegal():
+				return sections, tokens, fmt.Errorf(MsgIllegalToken, t.Value)
 			default:
 				return sections, tokens, fmt.Errorf(MsgUnexpectedToken)
 			}

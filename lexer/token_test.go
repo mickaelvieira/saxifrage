@@ -46,6 +46,16 @@ func TestTokenIsEOF(t *testing.T) {
 	assert.True(t, token.IsEOF(), "Test Case %v", token.Type)
 }
 
+func TestTokenIsSeparator(t *testing.T) {
+	token := &Token{Type: Separator}
+	assert.True(t, token.IsSeparator(), "Test Case %v", token.Type)
+}
+
+func TestTokenIsIllegal(t *testing.T) {
+	token := &Token{Type: Illegal}
+	assert.True(t, token.IsIllegal(), "Test Case %v", token.Type)
+}
+
 func TestTokenIsHostSection(t *testing.T) {
 	token := &Token{Type: Section, Value: "Host"}
 	assert.True(t, token.IsHostSection(), "Test Case %v", token.Type)

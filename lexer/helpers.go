@@ -8,6 +8,10 @@ func isHash(r rune) bool {
 	return r == '#'
 }
 
+func isSeparator(r rune) bool {
+	return r == '=' || r == ' '
+}
+
 func isDoubleQuote(r rune) bool {
 	return r == '"'
 }

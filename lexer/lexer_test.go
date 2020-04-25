@@ -158,7 +158,7 @@ func TestLexing(t *testing.T) {
 		{&Token{Type: EOL, Value: string(eol)}},
 		{&Token{Type: Whitespace, Value: " "}},
 		{&Token{Type: Section, Value: "Host"}},
-		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Separator, Value: " "}},
 		{&Token{Type: Value, Value: "*"}},
 		{&Token{Type: Whitespace, Value: " "}},
 		{&Token{Type: Comment, Value: "# here is the first comment"}},
@@ -166,7 +166,7 @@ func TestLexing(t *testing.T) {
 
 		{&Token{Type: Whitespace, Value: " "}},
 		{&Token{Type: Keyword, Value: "VisualHostKey"}},
-		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Separator, Value: "="}},
 		{&Token{Type: Value, Value: "foo"}},
 		{&Token{Type: Whitespace, Value: " "}},
 		{&Token{Type: Comment, Value: "# here is the second comment"}},
@@ -178,24 +178,24 @@ func TestLexing(t *testing.T) {
 
 		{&Token{Type: Whitespace, Value: " "}},
 		{&Token{Type: Keyword, Value: "HostName"}},
-		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Separator, Value: " "}},
 		{&Token{Type: Value, Value: "bar"}},
 		{&Token{Type: EOL, Value: string(eol)}},
 
 		{&Token{Type: EOL, Value: string(eol)}},
 
 		{&Token{Type: Keyword, Value: "ServerAliveInterval"}},
-		{&Token{Type: EOL, Value: string(eol)}},
+		{&Token{Type: Illegal, Value: string(eol)}},
 
-		{&Token{Type: EOL, Value: string(eol)}},
+		{&Token{Type: Illegal, Value: string(eol)}},
 
-		{&Token{Type: Value, Value: "foobar"}},
-		{&Token{Type: EOL, Value: string(eol)}},
+		{&Token{Type: Illegal, Value: "foobar"}},
+		{&Token{Type: Illegal, Value: string(eol)}},
 
-		{&Token{Type: EOL, Value: string(eol)}},
+		{&Token{Type: Illegal, Value: string(eol)}},
 
 		{&Token{Type: Keyword, Value: "VerifyHostKeyDNS"}},
-		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Separator, Value: " = "}},
 		{&Token{Type: Value, Value: "baz"}},
 		{&Token{Type: EOF, Value: string(eof)}},
 	}
@@ -206,7 +206,7 @@ func TestLexing(t *testing.T) {
 		input: `
 
 	Host * # here is the first comment
-	VisualHostKey foo # here is the second comment
+	VisualHostKey=foo # here is the second comment
 	# This is the third comment
 	HostName bar
 
@@ -214,15 +214,15 @@ ServerAliveInterval
 
 foobar
 
-VerifyHostKeyDNS baz`}
+VerifyHostKeyDNS = baz`}
 
 	go l.Lex()
 
 	var i int
 	for got := range tokens {
 		tc := cases[i]
-		assert.Equal(t, tc.want.Type, got.Type, "Test Case %d %v", i, tc)
-		assert.Equal(t, tc.want.Value, got.Value, "Test Case %d %v", i, tc)
+		assert.Equal(t, tc.want.Type, got.Type, "Test Case %d '%v'", i, tc.want.Value)
+		assert.Equal(t, tc.want.Value, got.Value, "Test Case %d %v", i, tc.want.Value)
 		i++
 	}
 }

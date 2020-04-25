@@ -1,8 +1,12 @@
 package lexer
 
+import (
+	"strings"
+)
+
 // https://linux.die.net/man/5/ssh_config
-// Keywords contains the list of ssh configuration keywords
-var keywords = map[string]string{
+// Keywords contains the list of ssh configuration mapping
+var mapping = map[string]string{
 	"AddressFamily":                    "any",
 	"BatchMode":                        "no",
 	"BindAddress":                      "",
@@ -71,7 +75,31 @@ var keywords = map[string]string{
 	"VisualHostKey":                    "no",
 }
 
+type keyword struct {
+	ID      string
+	Name    string
+	Default string
+}
+
+var keywords = make([]*keyword, len(mapping))
+
+func init() {
+	var i int
+	for k, v := range mapping {
+		keywords[i] = &keyword{
+			ID:      strings.ToLower(k),
+			Name:    k,
+			Default: v,
+		}
+		i++
+	}
+}
+
 func isKeyword(i string) bool {
-	_, ok := keywords[i]
-	return ok
+	for _, kw := range keywords {
+		if kw.ID == strings.ToLower(i) {
+			return true
+		}
+	}
+	return false
 }

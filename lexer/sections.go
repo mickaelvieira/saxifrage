@@ -1,5 +1,7 @@
 package lexer
 
+import "strings"
+
 var sections = []string{
 	"Host",
 	"Match",
@@ -7,7 +9,7 @@ var sections = []string{
 
 func isSection(i string) bool {
 	for _, val := range sections {
-		if i == val {
+		if strings.ToLower(i) == strings.ToLower(val) {
 			return true
 		}
 	}

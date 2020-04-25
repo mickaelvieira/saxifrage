@@ -5,18 +5,21 @@ type Type int
 
 // Lexer tokens
 const (
-	Illegal Type = iota
-	Err
-	EOF
-	EOL
-	Section
-	Keyword
-	Value
-	Whitespace
-	Comment
+	Illegal    Type = iota
+	Err             // A token is returned when an error is found during lexing
+	EOF             // the end of the file
+	EOL             // the end of a line
+	Section         // either Host or Match section
+	Keyword         // a keyword (AddressFamily, BatchMode, BindAddress, etc...)
+	Separator       // either a space or equal sign to separate keywords and values
+	Value           // the value of a keyword or a section
+	Whitespace      // a sequence of blank characters, either spaces or tabs
+	Comment         // a comment
 )
 
-// Token is a token returned by the lexer
+// Token is a token returned by the lexer.
+// It has a type and a value representing
+// the sequence of characters found in the input string
 type Token struct {
 	Type  Type
 	Value string
@@ -32,6 +35,11 @@ func (t *Token) IsKeyword() bool {
 	return t.Type == Keyword
 }
 
+// IsSeparator is the token a separator?
+func (t *Token) IsSeparator() bool {
+	return t.Type == Separator
+}
+
 // IsValue is the token a value?
 func (t *Token) IsValue() bool {
 	return t.Type == Value
@@ -45,6 +53,11 @@ func (t *Token) IsComment() bool {
 // IsError is the token an error?
 func (t *Token) IsError() bool {
 	return t.Type == Err
+}
+
+// IsIllegal is the token illegal?
+func (t *Token) IsIllegal() bool {
+	return t.Type == Illegal
 }
 
 // IsWhitespace is the token a whitespace?

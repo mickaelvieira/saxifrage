@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,13 @@ func TestIsSection(t *testing.T) {
 	}
 
 	for i, tc := range cases {
-		got := isSection(tc.input)
-		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
+		uc := tc.input
+		lc := strings.ToLower(uc)
+
+		got := isSection(uc)
+		assert.Equal(t, tc.want, got, "Test Case [Uppercase] %d %v", i, tc)
+
+		got = isSection(lc)
+		assert.Equal(t, tc.want, got, "Test Case [Lowercase] %d %v", i, tc)
 	}
 }

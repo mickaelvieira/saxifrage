@@ -38,6 +38,21 @@ func TestHash(t *testing.T) {
 	}
 }
 
+func TestSeparator(t *testing.T) {
+	cases := []struct {
+		input rune
+		want  bool
+	}{
+		{' ', true},
+		{'=', true},
+	}
+
+	for i, tc := range cases {
+		got := isSeparator(tc.input)
+		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
+	}
+}
+
 func TestDoubleQuote(t *testing.T) {
 	cases := []struct {
 		input rune

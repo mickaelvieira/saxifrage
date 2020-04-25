@@ -66,6 +66,14 @@ func (l *Lexer) lexWhitespaces() string {
 	return " "
 }
 
+func (l *Lexer) lexSeparator() (s string) {
+	for c := l.next(); isSeparator(c); c = l.next() {
+		s += string(c)
+	}
+	l.rewind()
+	return s
+}
+
 // move to the end of line
 func (l *Lexer) lexComments() (s string) {
 	for c := l.next(); !isEOL(c); c = l.next() {
@@ -76,7 +84,7 @@ func (l *Lexer) lexComments() (s string) {
 }
 
 func (l *Lexer) lexWord() (s string) {
-	for c := l.next(); !isWhitespace(c) && !isEOL(c) && !isEOF(c); c = l.next() {
+	for c := l.next(); !isSeparator(c) && !isEOL(c) && !isEOF(c); c = l.next() {
 		s += string(c)
 	}
 	l.rewind()
@@ -126,20 +134,14 @@ func (l *Lexer) lexChar() string {
 
 // Lex sends token over the tokens channel
 func (l *Lexer) Lex() {
-	var ev bool
+	var es bool // are we expecting a separator?
+	var ev bool // are we expecting a value?
 
 	tokenize := func(r rune) *Token {
-		if isWhitespace(r) {
-			return &Token{Type: Whitespace, Value: l.lexWhitespaces()}
-		}
-		if isHash(r) {
-			return &Token{Type: Comment, Value: l.lexComments()}
-		}
-		if isEOL(r) {
-			return &Token{Type: EOL, Value: l.lexChar()}
-		}
-		if isEOF(r) {
-			return &Token{Type: EOF, Value: l.lexChar()}
+		if es && isSeparator(r) {
+			es = false
+			ev = true // next token must be a value
+			return &Token{Type: Separator, Value: l.lexSeparator()}
 		}
 
 		if ev {
@@ -152,15 +154,38 @@ func (l *Lexer) Lex() {
 			return &Token{Type: Value, Value: v}
 		}
 
-		w := l.lexWord()
-		ev = true
-
-		t := Section
-		if isKeyword(w) {
-			t = Keyword
+		if isWhitespace(r) || isHash(r) || isEOL(r) || isEOF(r) {
+			if ev || es {
+				return &Token{Type: Illegal, Value: l.lexChar()}
+			}
+			if isWhitespace(r) {
+				return &Token{Type: Whitespace, Value: l.lexWhitespaces()}
+			}
+			if isHash(r) {
+				return &Token{Type: Comment, Value: l.lexComments()}
+			}
+			if isEOL(r) {
+				return &Token{Type: EOL, Value: l.lexChar()}
+			}
+			if isEOF(r) {
+				return &Token{Type: EOF, Value: l.lexChar()}
+			}
 		}
 
-		return &Token{Type: t, Value: w}
+		w := l.lexWord()
+
+		is := isSection(w)
+		ik := isKeyword(w)
+
+		if is || ik {
+			t := Section
+			if ik {
+				t = Keyword
+			}
+			es = true // next token must be a separator
+			return &Token{Type: t, Value: w}
+		}
+		return &Token{Type: Illegal, Value: w}
 	}
 
 	for t := tokenize(l.peek()); !t.IsEOF(); t = tokenize(l.peek()) {
