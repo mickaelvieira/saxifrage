@@ -174,12 +174,12 @@ func (l *Lexer) Lex() {
 
 		w := l.lexWord()
 
-		is := getSection(w)
-		ik := getKeyword(w)
+		is := isSection(w)
+		ik := isKeyword(w)
 
-		if is != nil || ik != nil {
+		if is || ik {
 			t := Section
-			if ik != nil {
+			if ik {
 				t = Keyword
 			}
 			es = true // next token must be a separator

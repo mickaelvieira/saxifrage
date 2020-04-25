@@ -39,10 +39,7 @@ func TestGetSection(t *testing.T) {
 
 	for i, tc := range cases {
 		uc := tc.input
-		lc := strings.ToLower(uc)
-
-		got := getSection(tc.input)
-		assert.Equal(t, uc, got.Name, "Test Case [Uppercase] %d %v", i, tc)
-		assert.Equal(t, lc, got.ID, "Test Case [Lowercase] %d %v", i, tc)
+		got := getSection(uc)
+		assert.Equal(t, uc, got, "Test Case [Uppercase] %d %v", i, tc)
 	}
 }

@@ -169,10 +169,7 @@ func TestGetKeyword(t *testing.T) {
 
 	for i, tc := range cases {
 		uc := tc.input
-		lc := strings.ToLower(uc)
-
 		got := getKeyword(tc.input)
-		assert.Equal(t, lc, got.ID, "Test Case [Uppercase] %d %v", i, tc)
 		assert.Equal(t, uc, got.Name, "Test Case [Uppercase] %d %v", i, tc)
 	}
 }

@@ -2,30 +2,19 @@ package lexer
 
 import "strings"
 
-type section struct {
-	ID   string
-	Name string
-}
-
-var sections = []*section{
-	{ID: "host", Name: "Host"},
-	{ID: "match", Name: "Match"},
+var sections = map[string]string{
+	"host":  "Host",
+	"match": "Match",
 }
 
 func isSection(i string) bool {
-	for _, s := range sections {
-		if strings.ToLower(i) == s.ID {
-			return true
-		}
-	}
-	return false
+	k := strings.ToLower(i)
+	_, ok := sections[k]
+	return ok
 }
 
-func getSection(i string) *section {
-	for _, s := range sections {
-		if strings.ToLower(i) == s.ID {
-			return s
-		}
-	}
-	return nil
+func getSection(i string) string {
+	k := strings.ToLower(i)
+	v, _ := sections[k]
+	return v
 }

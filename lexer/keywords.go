@@ -81,34 +81,29 @@ type keyword struct {
 	Default string
 }
 
-var keywords = make([]*keyword, len(mapping))
+var keywords = make(map[string]*keyword, len(mapping))
 
 func init() {
-	var i int
 	for k, v := range mapping {
-		keywords[i] = &keyword{
-			ID:      strings.ToLower(k),
+		id := strings.ToLower(k)
+		keywords[id] = &keyword{
 			Name:    k,
 			Default: v,
 		}
-		i++
 	}
 }
 
 func isKeyword(i string) bool {
-	for _, kw := range keywords {
-		if kw.ID == strings.ToLower(i) {
-			return true
-		}
-	}
-	return false
+	k := strings.ToLower(i)
+	_, ok := keywords[k]
+	return ok
 }
 
 func getKeyword(i string) *keyword {
-	for _, kw := range keywords {
-		if kw.ID == strings.ToLower(i) {
-			return kw
-		}
+	k := strings.ToLower(i)
+	kw, ok := keywords[k]
+	if ok {
+		return kw
 	}
 	return nil
 }
