@@ -157,7 +157,7 @@ func TestLexing(t *testing.T) {
 		{&Token{Type: EOL, Value: string(eol)}},
 		{&Token{Type: EOL, Value: string(eol)}},
 		{&Token{Type: Whitespace, Value: " "}},
-		{&Token{Type: Section, Value: "Host"}},
+		{&Token{Type: Section, Value: "host"}},
 		{&Token{Type: Separator, Value: " "}},
 		{&Token{Type: Value, Value: "*"}},
 		{&Token{Type: Whitespace, Value: " "}},
@@ -177,7 +177,7 @@ func TestLexing(t *testing.T) {
 		{&Token{Type: EOL, Value: string(eol)}},
 
 		{&Token{Type: Whitespace, Value: " "}},
-		{&Token{Type: Keyword, Value: "HostName"}},
+		{&Token{Type: Keyword, Value: "hostname"}},
 		{&Token{Type: Separator, Value: " "}},
 		{&Token{Type: Value, Value: "bar"}},
 		{&Token{Type: EOL, Value: string(eol)}},
@@ -205,10 +205,10 @@ func TestLexing(t *testing.T) {
 		tokens: tokens,
 		input: `
 
-	Host * # here is the first comment
+	host * # here is the first comment
 	VisualHostKey=foo # here is the second comment
 	# This is the third comment
-	HostName bar
+	hostname bar
 
 ServerAliveInterval
 

@@ -94,3 +94,85 @@ func TestIsKeyword(t *testing.T) {
 		assert.Equal(t, tc.want, got, "Test Case [Lowercase] %d %v", i, tc)
 	}
 }
+
+func TestGetKeyword(t *testing.T) {
+	cases := []struct {
+		input string
+	}{
+		{"AddressFamily"},
+		{"BatchMode"},
+		{"BindAddress"},
+		{"ChallengeResponseAuthentication"},
+		{"CheckHostIP"},
+		{"Cipher"},
+		{"Ciphers"},
+		{"ClearAllForwardings"},
+		{"Compression"},
+		{"CompressionLevel"},
+		{"ConnectionAttempts"},
+		{"ConnectTimeout"},
+		{"ControlMaster"},
+		{"ControlPath"},
+		{"DynamicForward"},
+		{"EscapeChar"},
+		{"ExitOnForwardFailure"},
+		{"ForwardAgent"},
+		{"ForwardX11"},
+		{"ForwardX11Trusted"},
+		{"GatewayPorts"},
+		{"GlobalKnownHostsFile"},
+		{"GSSAPIAuthentication"},
+		{"GSSAPIKeyExchange"},
+		{"GSSAPIClientIdentity"},
+		{"GSSAPIDelegateCredentials"},
+		{"GSSAPIRenewalForcesRekey"},
+		{"GSSAPITrustDns"},
+		{"HashKnownHosts"},
+		{"HostbasedAuthentication"},
+		{"HostKeyAlgorithms"},
+		{"HostKeyAlias"},
+		{"HostName"},
+		{"IdentitiesOnly"},
+		{"IdentityFile"},
+		{"KbdInteractiveAuthentication"},
+		{"KbdInteractiveDevices"},
+		{"LocalCommand"},
+		{"LocalForward"},
+		{"LogLevel"},
+		{"MACs"},
+		{"NoHostAuthenticationForLocalhost"},
+		{"PasswordAuthentication"},
+		{"PermitLocalCommand"},
+		{"PreferredAuthentications"},
+		{"Port"},
+		{"Protocol"},
+		{"ProxyCommand"},
+		{"PubkeyAuthentication"},
+		{"RekeyLimit"},
+		{"RemoteForward"},
+		{"RhostsRSAAuthentication"},
+		{"RSAAuthentication"},
+		{"SendEnv"},
+		{"ServerAliveCountMax"},
+		{"ServerAliveInterval"},
+		{"SmartcardDevice"},
+		{"StrictHostKeyChecking"},
+		{"TCPKeepAlive"},
+		{"Tunnel"},
+		{"TunnelDevice"},
+		{"User"},
+		{"UsePrivilegedPort"},
+		{"UserKnownHostsFile"},
+		{"VerifyHostKeyDNS"},
+		{"VisualHostKey"},
+	}
+
+	for i, tc := range cases {
+		uc := tc.input
+		lc := strings.ToLower(uc)
+
+		got := getKeyword(tc.input)
+		assert.Equal(t, lc, got.ID, "Test Case [Uppercase] %d %v", i, tc)
+		assert.Equal(t, uc, got.Name, "Test Case [Uppercase] %d %v", i, tc)
+	}
+}

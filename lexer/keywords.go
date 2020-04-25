@@ -103,3 +103,12 @@ func isKeyword(i string) bool {
 	}
 	return false
 }
+
+func getKeyword(i string) *keyword {
+	for _, kw := range keywords {
+		if kw.ID == strings.ToLower(i) {
+			return kw
+		}
+	}
+	return nil
+}

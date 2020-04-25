@@ -28,3 +28,21 @@ func TestIsSection(t *testing.T) {
 		assert.Equal(t, tc.want, got, "Test Case [Lowercase] %d %v", i, tc)
 	}
 }
+
+func TestGetSection(t *testing.T) {
+	cases := []struct {
+		input string
+	}{
+		{"Host"},
+		{"Match"},
+	}
+
+	for i, tc := range cases {
+		uc := tc.input
+		lc := strings.ToLower(uc)
+
+		got := getSection(tc.input)
+		assert.Equal(t, uc, got.Name, "Test Case [Uppercase] %d %v", i, tc)
+		assert.Equal(t, lc, got.ID, "Test Case [Lowercase] %d %v", i, tc)
+	}
+}
