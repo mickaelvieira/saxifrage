@@ -11,64 +11,106 @@ import (
 
 // Parser --
 type Parser struct {
-	tokens chan *lexer.Token // shared channel, I need to find a better name
-	lexer  *lexer.Lexer      // our lexer to perform the lexical analysis
+	lastError error
+	Sections  config.Sections
+	Tokens    []*lexer.Token // shared channel, I need to find a better name
+	lexer     *lexer.Lexer   // our lexer to perform the lexical analysis
+}
+
+func (p *Parser) store(in chan *lexer.Token) chan *lexer.Token {
+	out := make(chan *lexer.Token)
+
+	go func() {
+		defer close(out)
+		for t := range in {
+			p.Tokens = append(p.Tokens, t)
+			out <- t
+		}
+	}()
+
+	return out
+}
+
+func (p *Parser) group(in chan *lexer.Token) chan []*lexer.Token {
+	out := make(chan []*lexer.Token)
+
+	go func() {
+		defer close(out)
+
+		b := &group{}
+		for t := range in {
+			if t.IsSection() ||
+				t.IsKeyword() ||
+				t.IsSeparator() ||
+				t.IsValue() {
+				if err := b.add(t); err != nil {
+					p.lastError = err
+					return
+				}
+				if b.isFull() {
+					out <- b.tokens
+					b.clear()
+				}
+			}
+			if t.IsError() {
+				p.lastError = fmt.Errorf(MsgLexerError, t.Value)
+				return
+			}
+			if t.IsIllegal() {
+				p.lastError = fmt.Errorf(MsgIllegalToken, t.Value)
+				return
+			}
+		}
+	}()
+
+	return out
+}
+
+func (p *Parser) build(in chan []*lexer.Token) chan *config.Section {
+	out := make(chan *config.Section)
+
+	go func() {
+		defer close(out)
+
+		var se *config.Section
+
+		for tokens := range in {
+			k := tokens[0]
+			s := tokens[1]
+			v := tokens[2]
+
+			if k.IsSection() {
+				if se != nil {
+					out <- se
+				}
+				t := config.HostType
+				if k.IsMatchSection() {
+					t = config.MatchType
+				}
+				se = config.NewSection(t, s.Value, v.Value)
+			} else {
+				se.Options = append(se.Options, config.NewOption(k.Value, s.Value, v.Value))
+			}
+		}
+		if se != nil {
+			out <- se
+		}
+	}()
+
+	return out
 }
 
 // Parse --
-func (p *Parser) Parse() (config.Sections, []*lexer.Token, error) {
-	var tokens []*lexer.Token
-	var sections config.Sections
-	var keyword string
-	var section config.SectionType
+func (p *Parser) Parse() error {
+	t := p.store(p.lexer.Lex())
+	g := p.group(t)
+	s := p.build(g)
 
-	go p.lexer.Lex()
-
-	for t := range p.tokens {
-		tokens = append(tokens, t)
+	for section := range s {
+		p.Sections = append(p.Sections, section)
 	}
 
-	for _, t := range tokens {
-		if !t.IsComment() && !t.IsEOF() && !t.IsEOL() && !t.IsWhitespace() && !t.IsSeparator() {
-			switch {
-			case t.IsSection():
-				section = config.HostType
-				if t.IsMatchSection() {
-					section = config.MatchType
-				}
-			case t.IsKeyword():
-				keyword = t.Value
-			case t.IsValue() && section != "":
-				sections = append(sections, config.NewSection(section, t.Value))
-				section = ""
-			case t.IsValue() && keyword != "":
-				idx := len(sections) - 1
-				sections[idx].Configs[keyword] = t.Value
-				keyword = ""
-			case keyword != "" && !t.IsValue():
-				return sections, tokens, fmt.Errorf(MsgMissingKeywordValue, keyword)
-			case section != "" && !t.IsValue():
-				return sections, tokens, fmt.Errorf(MsgMissingSectionValue, section)
-			case t.IsError():
-				return sections, tokens, fmt.Errorf(MsgLexerError, t.Value)
-			case t.IsIllegal():
-				return sections, tokens, fmt.Errorf(MsgIllegalToken, t.Value)
-			default:
-				return sections, tokens, fmt.Errorf(MsgUnexpectedToken)
-			}
-		}
-	}
-
-	return sections, tokens, nil
-}
-
-// New creates a new parser
-func New(i string) *Parser {
-	c := make(chan *lexer.Token)
-	return &Parser{
-		tokens: c,
-		lexer:  lexer.New(i, c),
-	}
+	return p.lastError
 }
 
 // loadContent loads the file's content or panic if there are any errors
@@ -87,14 +129,13 @@ func ParseFile(path string) (*config.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	p := New(string(c))
+	p := &Parser{lexer: lexer.New(string(c))}
 
-	s, t, err := p.Parse()
-	if err != nil {
+	if err := p.Parse(); err != nil {
 		return nil, err
 	}
 
-	return &config.File{Path: path, Sections: s, Tokens: t}, nil
+	return &config.File{Path: path, Sections: p.Sections, Tokens: p.Tokens}, nil
 }
 
 // ParseFiles parses configuration files

@@ -17,18 +17,36 @@ func (s Sections) Filter() []*Section {
 	panic("not implemented")
 }
 
-// Section --
+// Section represents a section in a configuration file
+// It can be a Host or Match section
 type Section struct {
-	Type     SectionType
-	Matching string
-	Configs  map[string]string
+	Type      SectionType
+	Matching  string
+	Separator string
+	Options   []*Option
 }
 
-// NewSection --
-func NewSection(t SectionType, hosts string) *Section {
+// Option represents a section's option
+type Option struct {
+	Name      string
+	Value     string
+	Separator string
+}
+
+// NewSection creates a new section
+func NewSection(t SectionType, s string, v string) *Section {
 	return &Section{
-		Type:     t,
-		Matching: hosts,
-		Configs:  make(map[string]string),
+		Type:      t,
+		Matching:  v,
+		Separator: s,
+	}
+}
+
+// NewOption creates a new option
+func NewOption(n string, s string, v string) *Option {
+	return &Option{
+		Name:      n,
+		Separator: s,
+		Value:     v,
 	}
 }

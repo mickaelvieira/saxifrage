@@ -18,18 +18,14 @@ const eol = rune(10)
 // Lexer - lexical analysis
 // @TODO adds the current line number, to help debug parsing error?
 type Lexer struct {
-	input    string      // input string on which the lexical analysis
-	position int         // current position
-	width    int         // last rune's width
-	tokens   chan *Token // channel to send tokens over
+	input    string // input string on which the lexical analysis
+	position int    // current position
+	width    int    // last rune's width
 }
 
 // New create a new Lexer
-func New(i string, c chan *Token) *Lexer {
-	return &Lexer{
-		input:  i,
-		tokens: c,
-	}
+func New(i string) *Lexer {
+	return &Lexer{input: i}
 }
 
 // next returns the next rune
@@ -133,7 +129,7 @@ func (l *Lexer) lexChar() string {
 }
 
 // Lex sends token over the tokens channel
-func (l *Lexer) Lex() {
+func (l *Lexer) Lex() chan *Token {
 	var es bool // are we expecting a separator?
 	var ev bool // are we expecting a value?
 
@@ -188,8 +184,14 @@ func (l *Lexer) Lex() {
 		return &Token{Type: Illegal, Value: w}
 	}
 
-	for t := tokenize(l.peek()); !t.IsEOF(); t = tokenize(l.peek()) {
-		l.tokens <- t
-	}
-	close(l.tokens)
+	out := make(chan *Token)
+
+	go func() {
+		defer close(out)
+		for t := tokenize(l.peek()); !t.IsEOF(); t = tokenize(l.peek()) {
+			out <- t
+		}
+	}()
+
+	return out
 }

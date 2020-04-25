@@ -68,9 +68,9 @@ var (
 {{ if eq $l 0 }}
  No sections have been defined in this file
 {{ else }}{{ range .Sections }}
- {{ .Type | bold }} {{ .Matching | green | bold }}
-{{ range $key, $value := .Configs }}
-     {{ $key | bold }} {{ $value | green | bold }}{{ end }}
+ {{ .Type | bold }}{{ .Separator }}{{ .Matching | green | bold }}
+{{ range .Options }}
+     {{ .Name | bold }}{{ .Separator }}{{ .Value | green | bold }}{{ end }}
 {{ end }}{{ end }}{{ end }}`
 )
 

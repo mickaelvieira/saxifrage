@@ -200,9 +200,7 @@ func TestLexing(t *testing.T) {
 		{&Token{Type: EOF, Value: string(eof)}},
 	}
 
-	tokens := make(chan *Token)
 	l := Lexer{
-		tokens: tokens,
 		input: `
 
 	host * # here is the first comment
@@ -216,7 +214,7 @@ foobar
 
 VerifyHostKeyDNS = baz`}
 
-	go l.Lex()
+	tokens := l.Lex()
 
 	var i int
 	for got := range tokens {
