@@ -39,7 +39,7 @@ var fn = template.FuncMap{
 var (
 	helpTemplate = `
  NAME:
-  {{ .AppName }} - {{ .AppUsage }}
+  {{ .AppName }} {{ .AppVersion }} - {{ .AppUsage }}
 
  USAGE:
   {{ .AppName }} [command]

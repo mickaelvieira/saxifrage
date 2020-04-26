@@ -28,13 +28,15 @@ func getCommands(commands []*command) map[string]string {
 
 func runHelp(a *App) error {
 	d := struct {
-		AppName  string
-		AppUsage string
-		Commands map[string]string
+		AppName    string
+		AppUsage   string
+		AppVersion string
+		Commands   map[string]string
 	}{
-		AppName:  a.Name,
-		AppUsage: a.Usage,
-		Commands: getCommands(a.Commands),
+		AppName:    a.Name,
+		AppUsage:   a.Usage,
+		AppVersion: a.Version,
+		Commands:   getCommands(a.Commands),
 	}
 
 	if err := template.Render("help", d); err != nil {

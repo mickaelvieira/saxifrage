@@ -8,17 +8,18 @@ import (
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
+// App a cli application
+type App struct {
+	Name     string
+	Version  string
+	Usage    string
+	Commands []*command
+}
+
 type command struct {
 	Name   string
 	Usage  string
 	Action func(*App) error
-}
-
-// App a cli application
-type App struct {
-	Name     string
-	Usage    string
-	Commands []*command
 }
 
 // Run runs the application
@@ -58,9 +59,10 @@ func (a *App) find(name string) *command {
 }
 
 // New creates a new application
-func New() *App {
+func New(v string) *App {
 	a := &App{
-		Usage: "A CLI tool to manage your SSH keys",
+		Version: v,
+		Usage:   "A CLI tool to manage your SSH keys",
 	}
 
 	a.Commands = make([]*command, 4)
