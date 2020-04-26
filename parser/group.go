@@ -39,6 +39,10 @@ func (b *group) add(t *lexer.Token) (err error) {
 	return err
 }
 
+func (b *group) isEmpty() bool {
+	return len(b.tokens) == 0
+}
+
 func (b *group) isFull() bool {
 	return len(b.tokens) == 3
 }

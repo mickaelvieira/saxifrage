@@ -9,6 +9,16 @@ import (
 	"github.com/mickaelvieira/saxifrage/lexer"
 )
 
+// Parser messages list
+const (
+	msgMissingKeywordValue = "A value was expected for keyword %s"
+	msgMissingSectionValue = "A value was expected for section %s"
+	msgLexerError          = "Lexing error: %s"
+	msgIllegalToken        = "Illegal token: %s"
+	msgUnexpectedToken     = "Unexpected token"
+	msgNotEmptyGroup       = "Token is not empty but not full either"
+)
+
 // Parser --
 type Parser struct {
 	lastError error
@@ -53,13 +63,17 @@ func (p *Parser) group(in chan *lexer.Token) chan []*lexer.Token {
 				}
 			}
 			if t.IsError() {
-				p.lastError = fmt.Errorf(MsgLexerError, t.Value)
+				p.lastError = fmt.Errorf(msgLexerError, t.Value)
 				return
 			}
 			if t.IsIllegal() {
-				p.lastError = fmt.Errorf(MsgIllegalToken, t.Value)
+				p.lastError = fmt.Errorf(msgIllegalToken, t.Value)
 				return
 			}
+		}
+
+		if !b.isEmpty() {
+			p.lastError = fmt.Errorf(msgNotEmptyGroup)
 		}
 	}()
 
@@ -75,9 +89,9 @@ func (p *Parser) build(in chan []*lexer.Token) chan *config.Section {
 		var se *config.Section
 
 		for tokens := range in {
-			k := tokens[0]
-			s := tokens[1]
-			v := tokens[2]
+			k := tokens[0] // keyword
+			s := tokens[1] // separator
+			v := tokens[2] // value
 
 			if k.IsSection() {
 				if se != nil {
