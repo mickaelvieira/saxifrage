@@ -71,22 +71,20 @@ func TestPeek(t *testing.T) {
 	assert.Equal(t, '界', got, "Runes don't match")
 }
 
-func TestIgnoreWhitespaces(t *testing.T) {
+func TestWhitespaces(t *testing.T) {
 	cases := []struct {
 		input string
-		want  rune
+		want  string
 	}{
-		{"   a", 'a'},
-		{"	a", 'a'},
-		{"  	a", 'a'},
-		{"	  a", 'a'},
+		{"   a", "   "},
+		{"	a", "	"},
+		{"  	a", "  	"},
+		{"	  a", "	  "},
 	}
 
 	for i, tc := range cases {
 		l := Lexer{input: tc.input}
-		ws := l.lexWhitespaces()
-		got := l.next()
-		assert.Equal(t, " ", ws, "Test Case %d %v", i, tc)
+		got := l.lexWhitespaces()
 		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }
@@ -156,7 +154,7 @@ func TestLexing(t *testing.T) {
 	}{
 		{&Token{Type: EOL, Value: string(eol)}},
 		{&Token{Type: EOL, Value: string(eol)}},
-		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Whitespace, Value: "	"}},
 		{&Token{Type: Section, Value: "host"}},
 		{&Token{Type: Separator, Value: " "}},
 		{&Token{Type: Value, Value: "*"}},
@@ -164,7 +162,7 @@ func TestLexing(t *testing.T) {
 		{&Token{Type: Comment, Value: "# here is the first comment"}},
 		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Whitespace, Value: "	"}},
 		{&Token{Type: Keyword, Value: "VisualHostKey"}},
 		{&Token{Type: Separator, Value: "="}},
 		{&Token{Type: Value, Value: "foo"}},
@@ -172,11 +170,11 @@ func TestLexing(t *testing.T) {
 		{&Token{Type: Comment, Value: "# here is the second comment"}},
 		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Whitespace, Value: "	"}},
 		{&Token{Type: Comment, Value: "# This is the third comment"}},
 		{&Token{Type: EOL, Value: string(eol)}},
 
-		{&Token{Type: Whitespace, Value: " "}},
+		{&Token{Type: Whitespace, Value: "  "}},
 		{&Token{Type: Keyword, Value: "hostname"}},
 		{&Token{Type: Separator, Value: " "}},
 		{&Token{Type: Value, Value: "bar"}},
@@ -206,7 +204,7 @@ func TestLexing(t *testing.T) {
 	host * # here is the first comment
 	VisualHostKey=foo # here is the second comment
 	# This is the third comment
-	hostname bar
+  hostname bar
 
 ServerAliveInterval
 

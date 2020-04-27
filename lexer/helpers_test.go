@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestWhitespaces(t *testing.T) {
+func TestRuneIsWhitespaces(t *testing.T) {
 	cases := []struct {
 		input rune
 		want  bool
@@ -23,7 +23,7 @@ func TestWhitespaces(t *testing.T) {
 	}
 }
 
-func TestHash(t *testing.T) {
+func TestRuneIsHash(t *testing.T) {
 	cases := []struct {
 		input rune
 		want  bool
@@ -38,7 +38,7 @@ func TestHash(t *testing.T) {
 	}
 }
 
-func TestSeparator(t *testing.T) {
+func TestRuneIsSeparator(t *testing.T) {
 	cases := []struct {
 		input rune
 		want  bool
@@ -53,7 +53,7 @@ func TestSeparator(t *testing.T) {
 	}
 }
 
-func TestDoubleQuote(t *testing.T) {
+func TestRuneIsDoubleQuote(t *testing.T) {
 	cases := []struct {
 		input rune
 		want  bool
@@ -69,7 +69,7 @@ func TestDoubleQuote(t *testing.T) {
 	}
 }
 
-func TestEOF(t *testing.T) {
+func TestRuneIsEOF(t *testing.T) {
 	cases := []struct {
 		input rune
 		want  bool
@@ -84,7 +84,7 @@ func TestEOF(t *testing.T) {
 	}
 }
 
-func TestEOL(t *testing.T) {
+func TestRuneIsEOL(t *testing.T) {
 	cases := []struct {
 		input rune
 		want  bool

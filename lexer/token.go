@@ -94,3 +94,8 @@ func (t *Token) String() string {
 		return t.Value
 	}
 }
+
+// ToBytes returns the tokens as bytes
+func (t *Token) ToBytes() []byte {
+	return []byte(t.Value)
+}

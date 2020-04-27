@@ -137,6 +137,15 @@ func loadContent(path string) (s string, err error) {
 	return s, nil
 }
 
+// ParseString parses the input string
+func ParseString(in string) (config.Sections, []*lexer.Token, error) {
+	p := &Parser{lexer: lexer.New(in)}
+	if err := p.Parse(); err != nil {
+		return nil, nil, err
+	}
+	return p.Sections, p.Tokens, nil
+}
+
 // ParseFile parses the file content and returns configuration file structure
 func ParseFile(path string) (*config.File, error) {
 	c, err := loadContent(path)
@@ -153,8 +162,8 @@ func ParseFile(path string) (*config.File, error) {
 }
 
 // ParseFiles parses configuration files
-func ParseFiles() ([]*config.File, error) {
-	f := make([]*config.File, 2)
+func ParseFiles() (config.Files, error) {
+	f := make(config.Files, 2)
 
 	gc, err := ParseFile(config.GetGlobalConfigPath())
 	if err != nil {

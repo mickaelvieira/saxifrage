@@ -2,17 +2,24 @@ package prompt
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 
-	"github.com/manifoldco/promptui"
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
 // Msg output a message in the console
-func Msg(m string) {
-	f := promptui.Styler(promptui.FGBold, promptui.FGGreen)
-	fmt.Printf(" %s\n", f(m))
+func Msg(m string) error {
+	o := struct {
+		Text string
+	}{
+		Text: m,
+	}
+
+	if err := template.Output("message", o); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Confirm asks for user confirmation
@@ -26,7 +33,7 @@ func Confirm(t string) (bool, error) {
 
 	var c bool
 
-	if err := template.Render("ask-confirm", o); err != nil {
+	if err := template.Output("ask-confirm", o); err != nil {
 		return c, err
 	}
 
@@ -58,7 +65,7 @@ func Prompt(t string, d string) (string, error) {
 
 	var i string
 
-	if err := template.Render("read-input", o); err != nil {
+	if err := template.Output("read-input", o); err != nil {
 		return i, err
 	}
 

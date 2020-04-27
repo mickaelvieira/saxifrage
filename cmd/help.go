@@ -33,7 +33,7 @@ func runHelp(a *App) error {
 		Commands:   getCommandList(a.Commands),
 	}
 
-	if err := template.Render("help", d); err != nil {
+	if err := template.Output("help", d); err != nil {
 		return err
 	}
 	return nil

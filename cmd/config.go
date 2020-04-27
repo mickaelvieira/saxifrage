@@ -18,7 +18,7 @@ func runConfig(a *App) error {
 		Files: files,
 	}
 
-	if err := template.Render("list", d); err != nil {
+	if err := template.Output("list", d); err != nil {
 		return err
 	}
 

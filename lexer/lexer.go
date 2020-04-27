@@ -55,11 +55,12 @@ func (l *Lexer) rewind() {
 	l.position -= l.width
 }
 
-func (l *Lexer) lexWhitespaces() string {
-	for isWhitespace(l.next()) {
+func (l *Lexer) lexWhitespaces() (s string) {
+	for c := l.next(); isWhitespace(c); c = l.next() {
+		s += string(c)
 	}
 	l.rewind()
-	return " "
+	return s
 }
 
 func (l *Lexer) lexSeparator() (s string) {

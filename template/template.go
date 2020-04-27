@@ -1,6 +1,7 @@
 package template
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strings"
@@ -32,6 +33,11 @@ func Line(l int) string {
 }
 
 var (
+	configTemplate = `
+Host {{ .Host }}
+    PreferredAuthentications publickey
+    IdentityFile {{ .PrivateKey }}
+`
 	helpTemplate = `
  NAME:
   {{ .AppName }} {{ .AppVersion }} - {{ .AppUsage }}
@@ -69,7 +75,9 @@ var (
      {{ .Name | bold }}{{ .Separator }}{{ .Value | green | bold }}{{ end }}
 {{ end }}{{ end }}{{ end }}`
 	readInputTemplate  = `{{ "✔ " | green }}{{ .Text | bold }}{{ if .Default }} {{ printf "%s%s%s" "(" .Default ")" | faint }}{{ end }}{{ ": " | bold }}`
-	askConfirmTemplate = `{{ "? " | bold | blue }}{{ .Text | bold }} (y/N): `
+	askConfirmTemplate = `{{ "? " | bold | blue }}{{ printf "%s %s" .Text "(y/N)?" | bold }} `
+	messageTempate     = `{{ "=> " | bold | green }}{{ .Text | bold }}
+`
 )
 
 var templates = map[string]string{
@@ -79,13 +87,14 @@ var templates = map[string]string{
 	"list":        listTemplate,
 	"read-input":  readInputTemplate,
 	"ask-confirm": askConfirmTemplate,
+	"message":     messageTempate,
+	"config":      configTemplate,
 }
 
-// Render renders the template corresponding to the name with the provided data
-func Render(n string, d interface{}) error {
+func getTemplate(n string) (*template.Template, error) {
 	s, ok := templates[n]
 	if !ok {
-		return fmt.Errorf("Template '%s' does not exist", n)
+		return nil, fmt.Errorf("Template '%s' does not exist", n)
 	}
 
 	fn := promptui.FuncMap
@@ -94,6 +103,16 @@ func Render(n string, d interface{}) error {
 
 	t, err := template.New(n).Funcs(fn).Parse(s)
 	if err != nil {
+		return nil, err
+	}
+
+	return t, nil
+}
+
+// Output renders the template corresponding to the name with the provided data
+func Output(n string, d interface{}) error {
+	t, err := getTemplate(n)
+	if err != nil {
 		return err
 	}
 
@@ -101,4 +120,22 @@ func Render(n string, d interface{}) error {
 		return err
 	}
 	return nil
+}
+
+// AsString renders the template corresponding to the name with the provided data
+func AsString(n string, d interface{}) (s string, err error) {
+	t, err := getTemplate(n)
+	if err != nil {
+		return s, err
+	}
+
+	var buf bytes.Buffer
+
+	if err := t.Execute(&buf, d); err != nil {
+		return s, err
+	}
+
+	s = buf.String()
+
+	return s, nil
 }

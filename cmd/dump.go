@@ -18,7 +18,7 @@ func runDump(a *App) error {
 		Files: files,
 	}
 
-	if err := template.Render("dump", d); err != nil {
+	if err := template.Output("dump", d); err != nil {
 		return err
 	}
 
