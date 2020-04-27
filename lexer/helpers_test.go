@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRuneIsWhitespaces(t *testing.T) {
+func TestRuneIsTabOrSpace(t *testing.T) {
 	cases := []struct {
 		input rune
 		want  bool
@@ -18,7 +18,7 @@ func TestRuneIsWhitespaces(t *testing.T) {
 	}
 
 	for i, tc := range cases {
-		got := isWhitespace(tc.input)
+		got := isTabOrSpace(tc.input)
 		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }

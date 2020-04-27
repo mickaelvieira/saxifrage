@@ -152,13 +152,13 @@ func ParseFile(path string) (*config.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	p := &Parser{lexer: lexer.New(string(c))}
 
-	if err := p.Parse(); err != nil {
+	s, t, err := ParseString(string(c))
+	if err != nil {
 		return nil, err
 	}
 
-	return &config.File{Path: path, Sections: p.Sections, Tokens: p.Tokens}, nil
+	return &config.File{Path: path, Sections: s, Tokens: t}, nil
 }
 
 // ParseFiles parses configuration files

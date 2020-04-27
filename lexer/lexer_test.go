@@ -71,7 +71,7 @@ func TestPeek(t *testing.T) {
 	assert.Equal(t, '界', got, "Runes don't match")
 }
 
-func TestWhitespaces(t *testing.T) {
+func TestTabsAndSpaces(t *testing.T) {
 	cases := []struct {
 		input string
 		want  string
@@ -84,7 +84,7 @@ func TestWhitespaces(t *testing.T) {
 
 	for i, tc := range cases {
 		l := Lexer{input: tc.input}
-		got := l.lexWhitespaces()
+		got := l.lexTabsAndSpaces()
 		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }

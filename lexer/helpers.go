@@ -1,6 +1,6 @@
 package lexer
 
-func isWhitespace(r rune) bool {
+func isTabOrSpace(r rune) bool {
 	return r == ' ' || r == '\t'
 }
 

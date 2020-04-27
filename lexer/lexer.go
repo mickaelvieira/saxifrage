@@ -55,8 +55,8 @@ func (l *Lexer) rewind() {
 	l.position -= l.width
 }
 
-func (l *Lexer) lexWhitespaces() (s string) {
-	for c := l.next(); isWhitespace(c); c = l.next() {
+func (l *Lexer) lexTabsAndSpaces() (s string) {
+	for c := l.next(); isTabOrSpace(c); c = l.next() {
 		s += string(c)
 	}
 	l.rewind()
@@ -102,7 +102,7 @@ func (l *Lexer) lexValue() (string, error) {
 		if isHash(c) && !inQuote {
 			break
 		}
-		if isWhitespace(c) {
+		if isTabOrSpace(c) {
 			n := l.peek()
 			if isHash(n) && !inQuote {
 				break
@@ -151,12 +151,12 @@ func (l *Lexer) Lex() chan *Token {
 			return &Token{Type: Value, Value: v}
 		}
 
-		if isWhitespace(r) || isHash(r) || isEOL(r) || isEOF(r) {
+		if isTabOrSpace(r) || isHash(r) || isEOL(r) || isEOF(r) {
 			if ev || es {
 				return &Token{Type: Illegal, Value: l.lexChar()}
 			}
-			if isWhitespace(r) {
-				return &Token{Type: Whitespace, Value: l.lexWhitespaces()}
+			if isTabOrSpace(r) {
+				return &Token{Type: Whitespace, Value: l.lexTabsAndSpaces()}
 			}
 			if isHash(r) {
 				return &Token{Type: Comment, Value: l.lexComments()}
