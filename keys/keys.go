@@ -26,7 +26,8 @@ const (
 	INVALID Type = "invalid"
 )
 
-var types = []Type{RSA, DSA, ECDSA, ED25519}
+// Types contains the list of key types
+var Types = []Type{RSA, DSA, ECDSA, ED25519}
 
 // GetDefaultType returns the default type
 func GetDefaultType() Type {
@@ -36,8 +37,8 @@ func GetDefaultType() Type {
 // TypesToString returns the list of key types
 // separated by a comma
 func TypesToString() string {
-	s := make([]string, len(types))
-	for i, t := range types {
+	s := make([]string, len(Types))
+	for i, t := range Types {
 		s[i] = string(t)
 	}
 	return strings.Join(s[:], ", ")
@@ -54,7 +55,7 @@ var (
 
 // GetKeyType retrieves key type from user's input
 func GetKeyType(i string) Type {
-	for _, t := range types {
+	for _, t := range Types {
 		if i == string(t) {
 			return t
 		}

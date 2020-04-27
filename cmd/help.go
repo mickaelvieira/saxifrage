@@ -7,17 +7,11 @@ import (
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
-func getCommands(commands []*command) map[string]string {
-	var max int
-	for _, c := range commands {
-		l := len(c.Name)
-		if l > max {
-			max = l
-		}
-	}
+func getCommandList(a commands) map[string]string {
+	max := template.GetMaxLen(a.getNames())
 
 	m := make(map[string]string)
-	for _, c := range commands {
+	for _, c := range a {
 		f := "%-" + strconv.Itoa(max) + "s"
 		n := fmt.Sprintf(f, c.Name)
 		m[n] = c.Usage
@@ -36,7 +30,7 @@ func runHelp(a *App) error {
 		AppName:    a.Name,
 		AppUsage:   a.Usage,
 		AppVersion: a.Version,
-		Commands:   getCommands(a.Commands),
+		Commands:   getCommandList(a.Commands),
 	}
 
 	if err := template.Render("help", d); err != nil {

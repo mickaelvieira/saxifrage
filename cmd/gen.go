@@ -1,102 +1,117 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/manifoldco/promptui"
 	"github.com/mickaelvieira/saxifrage/keys"
+	"github.com/mickaelvieira/saxifrage/prompt"
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
 var (
-	msgConfirmOverride = "The key already exists. Do you want to override it?"
-	msgConfirmContinue = "Do you want to continue?"
-	msgConfirmKeyType  = "Enter the type of key you want to generate %s (default: %s)?"
-	msgConfirmDir      = "Enter the subdirectory (default: %s):"
-	msgConfirmFilename = "Enter the file name (default: %s):"
+	msgConfirmOverride = "The key already exists. Do you want to override it"
+	msgConfirmContinue = "Do you want to continue"
+	msgConfirmKeyType  = "Select the type of key you want to generate"
+	msgConfirmDir      = "Enter the directory"
+	msgConfirmFilename = "Enter the file name"
 )
 
-func askForKeyType() (keys.Type, error) {
-	f := template.Styler(template.FGBold, template.FGGreen)
-	t := keys.GetDefaultType()
-	s := keys.TypesToString()
-	i := readInput(fmt.Sprintf(msgConfirmKeyType, s, f(string(t))))
+type options struct {
+	KeyType    keys.Type
+	PrivateKey string
+	PublicKey  string
+	Directory  string
+}
 
-	if i != "" {
-		t = keys.GetKeyType(i)
-		if t == keys.INVALID {
-			return t, keys.ErrInvalidKeyType
-		}
+func askForKeyType(o *options) error {
+	s := promptui.Select{
+		Label:        msgConfirmKeyType,
+		Items:        keys.Types,
+		HideSelected: true,
 	}
-	return t, nil
+
+	_, r, err := s.Run()
+	if err != nil {
+		return err
+	}
+	t := keys.GetKeyType(r)
+	if t == keys.INVALID {
+		return keys.ErrInvalidKeyType
+	}
+
+	o.KeyType = t
+
+	return nil
 }
 
-func msg(m string) {
-	f := template.Styler(template.FGBold, template.FGGreen)
-	fmt.Printf(" %s\n", f(m))
+func askForDirectory(o *options) error {
+	o.Directory = keys.GetDir("")
+
+	r, err := prompt.Prompt(msgConfirmDir, o.Directory)
+	if err != nil {
+		return err
+	}
+	if r != "" {
+		o.Directory = keys.GetDir(r)
+	}
+
+	return nil
 }
 
-func askForDirectory() string {
-	f := template.Styler(template.FGBold, template.FGGreen)
-	s := keys.GetDir("")
-	m := fmt.Sprintf(msgConfirmDir, f(s))
-	return readInput(m)
-}
-
-func askForFilename(t keys.Type) string {
-	f := template.Styler(template.FGBold, template.FGGreen)
-	s, _ := keys.GetFilenamesFromType(t)
-	m := fmt.Sprintf(msgConfirmFilename, f(s))
-	return readInput(m)
-}
-
-func runGen(a *App) error {
-	t, err := askForKeyType()
+func askForFilename(o *options) error {
+	s, _ := keys.GetFilenamesFromType(o.KeyType)
+	r, err := prompt.Prompt(msgConfirmFilename, s)
 	if err != nil {
 		return err
 	}
 
-	dn := askForDirectory()
-	fn := askForFilename(t)
-	dp := keys.GetDir(dn)
-
-	fn1, fn2 := keys.GetFilenamesFromType(t)
-	if fn != "" {
-		fn1, fn2 = keys.GetFilenamesFromString(fn)
+	fn1, fn2 := keys.GetFilenamesFromType(o.KeyType)
+	if r != "" {
+		fn1, fn2 = keys.GetFilenamesFromString(r)
 	}
 
-	p1 := filepath.Join(dp, fn1)
-	p2 := filepath.Join(dp, fn2)
+	o.PrivateKey = filepath.Join(o.Directory, fn1)
+	o.PublicKey = filepath.Join(o.Directory, fn2)
 
-	d := struct {
-		Type       string
-		PrivateKey string
-		PublicKey  string
-	}{
-		Type:       string(t),
-		PrivateKey: p1,
-		PublicKey:  p2,
+	return nil
+}
+
+func runGen(a *App) error {
+	o := &options{}
+	if err := askForKeyType(o); err != nil {
+		return err
 	}
-
-	if err := template.Render("summary", d); err != nil {
+	if err := askForDirectory(o); err != nil {
+		return err
+	}
+	if err := askForFilename(o); err != nil {
+		return err
+	}
+	if err := template.Render("summary", o); err != nil {
+		return err
+	}
+	c, err := prompt.Confirm(msgConfirmContinue)
+	if err != nil {
 		return err
 	}
 
-	c := askConfirm(msgConfirmContinue)
-
 	if c {
 		// make sure we don't override an exiting key
-		if _, err := os.Stat(p1); err == nil {
-			o := askConfirm(msgConfirmOverride)
+		if _, err := os.Stat(o.PrivateKey); err == nil {
+			o, err := prompt.Confirm(msgConfirmOverride)
+			if err != nil {
+				return err
+			}
 			if !o {
 				return keys.ErrKeyOverrideNotAllowed
 			}
 		}
 
-		msg("Generating SSH keys...")
+		prompt.Msg("Generating SSH keys...")
 
-		g := keys.GetGenerator(t)
+		g := keys.GetGenerator(o.KeyType)
 
 		privateKey, err := g.GenPrivateKey()
 		if err != nil {
@@ -106,17 +121,17 @@ func runGen(a *App) error {
 		if err != nil {
 			return err
 		}
-		if err := keys.MakeDir(dp); err != nil {
+		if err := keys.MakeDir(o.Directory); err != nil {
 			return err
 		}
-		if err := keys.WriteToFile(privateKey, p1); err != nil {
+		if err := keys.WriteToFile(privateKey, o.PrivateKey); err != nil {
 			return err
 		}
-		if err := keys.WriteToFile(publicKey, p2); err != nil {
+		if err := keys.WriteToFile(publicKey, o.PublicKey); err != nil {
 			return err
 		}
 
-		msg("The SSH keys were generated successfully!")
+		prompt.Msg("The SSH keys were generated successfully!")
 	}
 
 	return nil

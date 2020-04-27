@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/manifoldco/promptui"
 	"github.com/mickaelvieira/saxifrage/keys"
-	"github.com/mickaelvieira/saxifrage/template"
 )
 
 // App a cli application
@@ -13,7 +13,17 @@ type App struct {
 	Name     string
 	Version  string
 	Usage    string
-	Commands []*command
+	Commands commands
+}
+
+type commands []*command
+
+func (c *commands) getNames() []string {
+	names := make([]string, len(*c))
+	for i, cmd := range *c {
+		names[i] = cmd.Name
+	}
+	return names
 }
 
 type command struct {
@@ -45,7 +55,7 @@ func (a *App) Run(args []string) error {
 
 // PrintError prints the error
 func (a *App) PrintError(e error) {
-	fn := template.Styler(template.FGBold, template.FGRed)
+	fn := promptui.Styler(promptui.FGBold, promptui.FGRed)
 	fmt.Printf(" %s\n", fn(e))
 }
 
@@ -65,7 +75,7 @@ func New(v string) *App {
 		Usage:   "A CLI tool to manage your SSH keys",
 	}
 
-	a.Commands = make([]*command, 4)
+	a.Commands = make(commands, 4)
 	a.Commands[0] = &command{Name: "gen", Usage: fmt.Sprintf("Generate interactively a SSH key (%s)", keys.TypesToString()), Action: runGen}
 	a.Commands[1] = &command{Name: "config", Usage: "Show your SSH configuration", Action: runConfig}
 	a.Commands[2] = &command{Name: "dump", Usage: "Dump your SSH configuration", Action: runDump}
