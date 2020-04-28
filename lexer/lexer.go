@@ -1,14 +1,13 @@
 package lexer
 
 import (
-	"errors"
+	"fmt"
 	"unicode/utf8"
 )
 
-// Lexing errors
-var (
-	ErrUnclosedQuote = errors.New("Double quote is not closed")
-	ErrExpectedValue = errors.New("A value was expected")
+const (
+	msgIllegalCharacter    = "Illegal character '%s' at line %d, column %d"
+	msgMissingClosingQuote = "Double quote is not closed at line %d, column %d"
 )
 
 // create a EOF constant for clarity
@@ -16,16 +15,17 @@ const eof = rune(0)
 const eol = rune(10)
 
 // Lexer - lexical analysis
-// @TODO adds the current line number, to help debug parsing error?
 type Lexer struct {
 	input    string // input string on which the lexical analysis
 	position int    // current position
 	width    int    // last rune's width
+	line     int    // current line
+	column   int    // current position in the line
 }
 
 // New create a new Lexer
 func New(i string) *Lexer {
-	return &Lexer{input: i}
+	return &Lexer{input: i, line: 1, column: 1}
 }
 
 func (l *Lexer) next() rune {
@@ -36,7 +36,8 @@ func (l *Lexer) next() rune {
 
 	r, w := utf8.DecodeRuneInString(l.input[l.position:]) // returns the first rune
 
-	l.position += w // set the next position
+	l.position += w // set the next position in the string
+	l.column += w   // set the next position in the current line
 	l.width = w     // keep the last rune's width in order to be able to backup
 
 	return r
@@ -50,6 +51,12 @@ func (l *Lexer) peek() rune {
 
 func (l *Lexer) rewind() {
 	l.position -= l.width
+	l.column -= l.width
+}
+
+func (l *Lexer) newLine() {
+	l.line++
+	l.column = 1
 }
 
 func (l *Lexer) lexWhitespaces() *Token {
@@ -86,6 +93,9 @@ func (l *Lexer) lexComments() *Token {
 }
 
 func (l *Lexer) lexWord() *Token {
+	var col = l.column
+	var line = l.line
+
 	var s string
 
 	for c := l.next(); !isSeparator(c) && !isEOL(c) && !isEOF(c); c = l.next() {
@@ -103,11 +113,16 @@ func (l *Lexer) lexWord() *Token {
 		}
 		return &Token{Type: t, Value: s}
 	}
-
-	return &Token{Type: Illegal, Value: s}
+	return &Token{
+		Type:  Illegal,
+		Value: fmt.Sprintf(msgIllegalCharacter, s, line, col),
+	}
 }
 
 func (l *Lexer) lexValue() *Token {
+	var col = l.column
+	var line = l.line
+
 	var inQuote = false
 	var s string
 
@@ -139,7 +154,10 @@ func (l *Lexer) lexValue() *Token {
 	l.rewind()
 
 	if inQuote {
-		return &Token{Type: Err, Value: ErrUnclosedQuote.Error()}
+		return &Token{
+			Type:  Err,
+			Value: fmt.Sprintf(msgMissingClosingQuote, line, col),
+		}
 	}
 
 	return &Token{Type: Value, Value: s}
@@ -147,12 +165,26 @@ func (l *Lexer) lexValue() *Token {
 
 func (l *Lexer) lexEOL() *Token {
 	c := l.next()
+	l.newLine()
 	return &Token{Type: EOL, Value: string(c)}
 }
 
 func (l *Lexer) lexEOF() *Token {
 	c := l.next()
 	return &Token{Type: EOF, Value: string(c)}
+}
+
+func (l *Lexer) lexIllegal() *Token {
+	var col = l.column
+	var line = l.line
+
+	c := l.next()
+	v := fmt.Sprintf(msgIllegalCharacter, string(c), line, col)
+
+	if isEOL(c) {
+		l.newLine()
+	}
+	return &Token{Type: Illegal, Value: v}
 }
 
 // Lex performs the lexical analysis of the input text
@@ -171,7 +203,7 @@ func (l *Lexer) Lex() chan *Token {
 
 		if isWhitespace(r) || isHash(r) || isEOL(r) || isEOF(r) {
 			if ev || es {
-				return &Token{Type: Illegal, Value: string(l.next())}
+				return l.lexIllegal()
 			}
 			if isWhitespace(r) {
 				return l.lexWhitespaces()

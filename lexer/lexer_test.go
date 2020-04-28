@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -115,7 +116,7 @@ func TestWord(t *testing.T) {
 	}{
 		{"Host", "Host", Section},
 		{"User", "User", Keyword},
-		{"foo", "foo", Illegal},
+		{"foo", fmt.Sprintf(msgIllegalCharacter, "foo", 0, 0), Illegal},
 	}
 
 	for i, tc := range cases {
@@ -140,7 +141,7 @@ func TestValues(t *testing.T) {
 `, "bar foo", Value},
 		{`"foo bar" foo, baz
 `, "\"foo bar\" foo, baz", Value},
-		{`"bar foo, baz`, ErrUnclosedQuote.Error(), Err},
+		{`"bar foo, baz`, fmt.Sprintf(msgMissingClosingQuote, 0, 0), Err},
 	}
 
 	for i, tc := range cases {
@@ -153,7 +154,7 @@ func TestValues(t *testing.T) {
 
 func TestLexing(t *testing.T) {
 	cases := []struct {
-		want *Token
+		token *Token
 	}{
 		{&Token{Type: EOL, Value: string(eol)}},
 		{&Token{Type: EOL, Value: string(eol)}},
@@ -186,14 +187,14 @@ func TestLexing(t *testing.T) {
 		{&Token{Type: EOL, Value: string(eol)}},
 
 		{&Token{Type: Keyword, Value: "ServerAliveInterval"}},
-		{&Token{Type: Illegal, Value: string(eol)}},
+		{&Token{Type: Illegal, Value: fmt.Sprintf(msgIllegalCharacter, string(eol), 8, 20)}},
 
-		{&Token{Type: Illegal, Value: string(eol)}},
+		{&Token{Type: Illegal, Value: fmt.Sprintf(msgIllegalCharacter, string(eol), 9, 1)}},
 
-		{&Token{Type: Illegal, Value: "foobar"}},
-		{&Token{Type: Illegal, Value: string(eol)}},
+		{&Token{Type: Illegal, Value: fmt.Sprintf(msgIllegalCharacter, "foobar", 10, 1)}},
+		{&Token{Type: Illegal, Value: fmt.Sprintf(msgIllegalCharacter, string(eol), 10, 7)}},
 
-		{&Token{Type: Illegal, Value: string(eol)}},
+		{&Token{Type: Illegal, Value: fmt.Sprintf(msgIllegalCharacter, string(eol), 11, 1)}},
 
 		{&Token{Type: Keyword, Value: "VerifyHostKeyDNS"}},
 		{&Token{Type: Separator, Value: " = "}},
@@ -201,8 +202,7 @@ func TestLexing(t *testing.T) {
 		{&Token{Type: EOF, Value: string(eof)}},
 	}
 
-	l := Lexer{
-		input: `
+	l := New(`
 
 	host * # here is the first comment
 	VisualHostKey=foo # here is the second comment
@@ -213,15 +213,15 @@ ServerAliveInterval
 
 foobar
 
-VerifyHostKeyDNS = baz`}
+VerifyHostKeyDNS = baz`)
 
 	tokens := l.Lex()
 
 	var i int
 	for got := range tokens {
 		tc := cases[i]
-		assert.Equal(t, tc.want.Type, got.Type, "Test Case %d '%v'", i, tc.want.Value)
-		assert.Equal(t, tc.want.Value, got.Value, "Test Case %d %v", i, tc.want.Value)
+		assert.Equal(t, tc.token.Type, got.Type, "Test Case %d [type] '%v'", i, tc.token)
+		assert.Equal(t, tc.token.Value, got.Value, "Test Case %d [value] '%v'", i, tc.token)
 		i++
 	}
 }
