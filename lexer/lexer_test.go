@@ -84,7 +84,7 @@ func TestTabsAndSpaces(t *testing.T) {
 
 	for i, tc := range cases {
 		l := Lexer{input: tc.input}
-		got := l.lexTabsAndSpaces()
+		got := l.lexWhitespaces()
 		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
 }

@@ -28,7 +28,6 @@ func New(i string) *Lexer {
 	return &Lexer{input: i}
 }
 
-// next returns the next rune
 func (l *Lexer) next() rune {
 	if l.position >= len(l.input) {
 		l.width = 0
@@ -43,20 +42,18 @@ func (l *Lexer) next() rune {
 	return r
 }
 
-// get the character without moving
 func (l *Lexer) peek() rune {
 	r := l.next()
 	l.rewind()
 	return r
 }
 
-// rewind move back to the previous position
 func (l *Lexer) rewind() {
 	l.position -= l.width
 }
 
-func (l *Lexer) lexTabsAndSpaces() (s string) {
-	for c := l.next(); isTabOrSpace(c); c = l.next() {
+func (l *Lexer) lexWhitespaces() (s string) {
+	for c := l.next(); isWhitespace(c); c = l.next() {
 		s += string(c)
 	}
 	l.rewind()
@@ -71,7 +68,6 @@ func (l *Lexer) lexSeparator() (s string) {
 	return s
 }
 
-// move to the end of line
 func (l *Lexer) lexComments() (s string) {
 	for c := l.next(); !isEOL(c); c = l.next() {
 		s += string(c)
@@ -102,7 +98,7 @@ func (l *Lexer) lexValue() (string, error) {
 		if isHash(c) && !inQuote {
 			break
 		}
-		if isTabOrSpace(c) {
+		if isWhitespace(c) {
 			n := l.peek()
 			if isHash(n) && !inQuote {
 				break
@@ -129,7 +125,8 @@ func (l *Lexer) lexChar() string {
 	return string(c)
 }
 
-// Lex sends token over the tokens channel
+// Lex performs the lexical analysis of the input text
+// Tokens will be send over the channel returned by this method
 func (l *Lexer) Lex() chan *Token {
 	var es bool // are we expecting a separator?
 	var ev bool // are we expecting a value?
@@ -151,12 +148,12 @@ func (l *Lexer) Lex() chan *Token {
 			return &Token{Type: Value, Value: v}
 		}
 
-		if isTabOrSpace(r) || isHash(r) || isEOL(r) || isEOF(r) {
+		if isWhitespace(r) || isHash(r) || isEOL(r) || isEOF(r) {
 			if ev || es {
 				return &Token{Type: Illegal, Value: l.lexChar()}
 			}
-			if isTabOrSpace(r) {
-				return &Token{Type: Whitespace, Value: l.lexTabsAndSpaces()}
+			if isWhitespace(r) {
+				return &Token{Type: Whitespace, Value: l.lexWhitespaces()}
 			}
 			if isHash(r) {
 				return &Token{Type: Comment, Value: l.lexComments()}

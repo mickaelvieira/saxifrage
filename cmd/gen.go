@@ -13,7 +13,7 @@ import (
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
-var (
+const (
 	msgConfirmOverride    = "The key already exists. Do you want to override it"
 	msgConfirmContinue    = "Do you want to continue"
 	msgConfirmAddition    = "Do you want to add this key to your config file"

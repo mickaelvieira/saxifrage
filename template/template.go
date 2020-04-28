@@ -130,7 +130,6 @@ func AsString(n string, d interface{}) (s string, err error) {
 	}
 
 	var buf bytes.Buffer
-
 	if err := t.Execute(&buf, d); err != nil {
 		return s, err
 	}

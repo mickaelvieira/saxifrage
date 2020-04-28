@@ -5,16 +5,16 @@ type Type int
 
 // Lexer tokens
 const (
-	Illegal    Type = iota
-	Err             // A token is returned when an error is found during lexing
-	EOF             // the end of the file
-	EOL             // the end of a line
-	Section         // either Host or Match section
-	Keyword         // a keyword (AddressFamily, BatchMode, BindAddress, etc...)
-	Separator       // either a space or equal sign to separate keywords and values
-	Value           // the value of a keyword or a section
-	Whitespace      // a sequence of blank characters, either spaces or tabs
-	Comment         // a comment
+	Illegal    Type = iota // A illegal token is returned when an unexpected token is encounter
+	Err                    // A token is returned when an error is found during lexing
+	EOF                    // the end of the file
+	EOL                    // the end of a line
+	Section                // either Host or Match section
+	Keyword                // a keyword (AddressFamily, BatchMode, BindAddress, etc...)
+	Separator              // either a space or equal sign to separate keywords and values
+	Value                  // the value of a keyword or a section
+	Whitespace             // a sequence of blank characters, either spaces or tabs
+	Comment                // a comment
 )
 
 // Token is a token returned by the lexer.
