@@ -14,8 +14,12 @@ const (
 const eof = rune(0)
 const eol = rune(10)
 
-// Lexer - lexical analysis
-type Lexer struct {
+// Tokenizer describes a Lexer struct
+type Tokenizer interface {
+	Run() chan *Token
+}
+
+type tokenizer struct {
 	input    string // input string on which the lexical analysis
 	position int    // current position
 	width    int    // last rune's width
@@ -24,11 +28,11 @@ type Lexer struct {
 }
 
 // New create a new Lexer
-func New(i string) *Lexer {
-	return &Lexer{input: i, line: 1, column: 1}
+func New(i string) Tokenizer {
+	return &tokenizer{input: i, line: 1, column: 1}
 }
 
-func (l *Lexer) next() rune {
+func (l *tokenizer) next() rune {
 	if l.position >= len(l.input) {
 		l.width = 0
 		return eof
@@ -43,23 +47,23 @@ func (l *Lexer) next() rune {
 	return r
 }
 
-func (l *Lexer) peek() rune {
+func (l *tokenizer) peek() rune {
 	r := l.next()
 	l.rewind()
 	return r
 }
 
-func (l *Lexer) rewind() {
+func (l *tokenizer) rewind() {
 	l.position -= l.width
 	l.column -= l.width
 }
 
-func (l *Lexer) newLine() {
+func (l *tokenizer) newLine() {
 	l.line++
 	l.column = 1
 }
 
-func (l *Lexer) lexWhitespaces() *Token {
+func (l *tokenizer) lexWhitespaces() *Token {
 	var s string
 
 	for c := l.next(); isWhitespace(c); c = l.next() {
@@ -70,7 +74,7 @@ func (l *Lexer) lexWhitespaces() *Token {
 	return &Token{Type: Whitespace, Value: s}
 }
 
-func (l *Lexer) lexSeparator() *Token {
+func (l *tokenizer) lexSeparator() *Token {
 	var s string
 
 	for c := l.next(); isSeparator(c); c = l.next() {
@@ -81,7 +85,7 @@ func (l *Lexer) lexSeparator() *Token {
 	return &Token{Type: Separator, Value: s}
 }
 
-func (l *Lexer) lexComments() *Token {
+func (l *tokenizer) lexComments() *Token {
 	var s string
 
 	for c := l.next(); !isEOL(c); c = l.next() {
@@ -92,7 +96,7 @@ func (l *Lexer) lexComments() *Token {
 	return &Token{Type: Comment, Value: s}
 }
 
-func (l *Lexer) lexWord() *Token {
+func (l *tokenizer) lexWord() *Token {
 	var col = l.column
 	var line = l.line
 
@@ -119,7 +123,7 @@ func (l *Lexer) lexWord() *Token {
 	}
 }
 
-func (l *Lexer) lexValue() *Token {
+func (l *tokenizer) lexValue() *Token {
 	var col = l.column
 	var line = l.line
 
@@ -163,18 +167,18 @@ func (l *Lexer) lexValue() *Token {
 	return &Token{Type: Value, Value: s}
 }
 
-func (l *Lexer) lexEOL() *Token {
+func (l *tokenizer) lexEOL() *Token {
 	c := l.next()
 	l.newLine()
 	return &Token{Type: EOL, Value: string(c)}
 }
 
-func (l *Lexer) lexEOF() *Token {
+func (l *tokenizer) lexEOF() *Token {
 	c := l.next()
 	return &Token{Type: EOF, Value: string(c)}
 }
 
-func (l *Lexer) lexIllegal() *Token {
+func (l *tokenizer) lexIllegal() *Token {
 	var col = l.column
 	var line = l.line
 
@@ -187,10 +191,10 @@ func (l *Lexer) lexIllegal() *Token {
 	return &Token{Type: Illegal, Value: v}
 }
 
-// Lex performs the lexical analysis of the input text
+// Run performs the lexical analysis of the input text
 // Tokens will be send over the channel returned by this method
 // until it reaches the end of the string
-func (l *Lexer) Lex() chan *Token {
+func (l *tokenizer) Run() chan *Token {
 	var es bool // are we expecting a separator?
 	var ev bool // are we expecting a value?
 

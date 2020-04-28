@@ -17,17 +17,28 @@ const (
 	msgIllegalToken        = "Illegal token: %s"
 	msgUnexpectedToken     = "Unexpected token"
 	msgNotEmptyGroup       = "Token is not empty but not full either"
+	msgNullSection         = "Cannot add options before declaring a section"
 )
 
 // Parser --
 type Parser struct {
+	// The last error triggered during parsing
 	lastError error
-	Sections  config.Sections
-	Tokens    []*lexer.Token // shared channel, I need to find a better name
-	lexer     *lexer.Lexer   // our lexer to perform the lexical analysis
+
+	// The Tokenizer
+	tokenizer lexer.Tokenizer
+
+	// Sections gathers the sections
+	// built with the tokens received
+	// from the tokenizer
+	Sections config.Sections
+
+	// Tokens gathers all the tokens
+	// by the tokenizer
+	Tokens []*lexer.Token
 }
 
-func (p *Parser) store(in chan *lexer.Token) chan *lexer.Token {
+func (p *Parser) collect(in chan *lexer.Token) chan *lexer.Token {
 	out := make(chan *lexer.Token)
 
 	go func() {
@@ -41,7 +52,7 @@ func (p *Parser) store(in chan *lexer.Token) chan *lexer.Token {
 	return out
 }
 
-func (p *Parser) group(in chan *lexer.Token) chan []*lexer.Token {
+func (p *Parser) groupKeysValues(in chan *lexer.Token) chan []*lexer.Token {
 	out := make(chan []*lexer.Token)
 
 	go func() {
@@ -80,7 +91,7 @@ func (p *Parser) group(in chan *lexer.Token) chan []*lexer.Token {
 	return out
 }
 
-func (p *Parser) build(in chan []*lexer.Token) chan *config.Section {
+func (p *Parser) buildSections(in chan []*lexer.Token) chan *config.Section {
 	out := make(chan *config.Section)
 
 	go func() {
@@ -103,6 +114,10 @@ func (p *Parser) build(in chan []*lexer.Token) chan *config.Section {
 				}
 				se = config.NewSection(t, s.Value, v.Value)
 			} else {
+				if se == nil {
+					p.lastError = fmt.Errorf(msgNullSection)
+					return
+				}
 				se.Options = append(se.Options, config.NewOption(k.Value, s.Value, v.Value))
 			}
 		}
@@ -116,11 +131,9 @@ func (p *Parser) build(in chan []*lexer.Token) chan *config.Section {
 
 // Parse --
 func (p *Parser) Parse() error {
-	t := p.store(p.lexer.Lex())
-	g := p.group(t)
-	s := p.build(g)
+	t := p.collect(p.tokenizer.Run())
 
-	for section := range s {
+	for section := range p.buildSections(p.groupKeysValues(t)) {
 		p.Sections = append(p.Sections, section)
 	}
 
@@ -139,7 +152,7 @@ func loadContent(path string) (s string, err error) {
 
 // ParseString parses the input string
 func ParseString(in string) (config.Sections, []*lexer.Token, error) {
-	p := &Parser{lexer: lexer.New(in)}
+	p := &Parser{tokenizer: lexer.New(in)}
 	if err := p.Parse(); err != nil {
 		return nil, nil, err
 	}

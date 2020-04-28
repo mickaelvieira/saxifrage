@@ -23,7 +23,7 @@ func TestNext(t *testing.T) {
 		{eof},
 	}
 
-	l := Lexer{input: "Hello, 世界"}
+	l := tokenizer{input: "Hello, 世界"}
 
 	for i, tc := range cases {
 		got := l.next()
@@ -38,7 +38,7 @@ func TestNextEmptyString(t *testing.T) {
 		{eof},
 	}
 
-	l := Lexer{}
+	l := tokenizer{}
 
 	for i, tc := range cases {
 		got := l.next()
@@ -47,7 +47,7 @@ func TestNextEmptyString(t *testing.T) {
 }
 
 func TestRewind(t *testing.T) {
-	l := Lexer{input: "世界"}
+	l := tokenizer{input: "世界"}
 
 	got := l.next()
 	assert.Equal(t, '世', got, "Runes don't match")
@@ -60,16 +60,35 @@ func TestRewind(t *testing.T) {
 
 func TestPeek(t *testing.T) {
 
-	l := Lexer{input: "世界"}
+	i := `世
+界`
+	l := tokenizer{input: i, line: 1, column: 1}
 
-	got := l.next()
-	assert.Equal(t, '世', got, "Runes don't match")
+	cases := []struct {
+		r        rune
+		position int
+		column   int
+	}{
+		{'世', 0, 1},
+		{'世', 3, 4},
+		{eol, 3, 4},
+		{eol, 4, 5},
+		{'界', 4, 5},
+		{'界', 7, 8},
+	}
 
-	got = l.peek()
-	assert.Equal(t, '界', got, "Runes don't match")
+	for i, tc := range cases {
+		var r rune
+		if i%2 == 0 {
+			r = l.peek()
+		} else {
+			r = l.next()
+		}
 
-	got = l.next()
-	assert.Equal(t, '界', got, "Runes don't match")
+		assert.Equal(t, tc.r, r, "Test Case %d [rune] %v", i, tc)
+		assert.Equal(t, tc.position, l.position, "Test Case %d [position] %v", i, tc)
+		assert.Equal(t, tc.column, l.column, "Test Case %d [column] %v", i, tc)
+	}
 }
 
 func TestWhitespaces(t *testing.T) {
@@ -84,7 +103,7 @@ func TestWhitespaces(t *testing.T) {
 	}
 
 	for i, tc := range cases {
-		l := Lexer{input: tc.input}
+		l := tokenizer{input: tc.input}
 		got := l.lexWhitespaces()
 		assert.Equal(t, Whitespace, got.Type, "Test Case %d %v", i, tc)
 		assert.Equal(t, tc.want, got.Value, "Test Case %d %v", i, tc)
@@ -101,7 +120,7 @@ func TestComments(t *testing.T) {
 	}
 
 	for i, tc := range cases {
-		l := Lexer{input: tc.input}
+		l := tokenizer{input: tc.input}
 		got := l.lexComments()
 		assert.Equal(t, Comment, got.Type, "Test Case %d %v", i, tc)
 		assert.Equal(t, tc.want, got.Value, "Test Case %d %v", i, tc)
@@ -120,7 +139,7 @@ func TestWord(t *testing.T) {
 	}
 
 	for i, tc := range cases {
-		l := Lexer{input: tc.input}
+		l := tokenizer{input: tc.input}
 		got := l.lexWord()
 		assert.Equal(t, tc.want1, got.Value, "Test Case %d %v", i, tc)
 		assert.Equal(t, tc.want2, got.Type, "Test Case %d %v", i, tc)
@@ -145,7 +164,7 @@ func TestValues(t *testing.T) {
 	}
 
 	for i, tc := range cases {
-		l := Lexer{input: tc.input}
+		l := tokenizer{input: tc.input}
 		got := l.lexValue()
 		assert.Equal(t, tc.want1, got.Value, "Test Case %d %v", i, tc)
 		assert.Equal(t, tc.want2, got.Type, "Test Case %d %v", i, tc)
@@ -215,7 +234,7 @@ foobar
 
 VerifyHostKeyDNS = baz`)
 
-	tokens := l.Lex()
+	tokens := l.Run()
 
 	var i int
 	for got := range tokens {
