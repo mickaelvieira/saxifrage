@@ -52,42 +52,67 @@ func (l *Lexer) rewind() {
 	l.position -= l.width
 }
 
-func (l *Lexer) lexWhitespaces() (s string) {
+func (l *Lexer) lexWhitespaces() *Token {
+	var s string
+
 	for c := l.next(); isWhitespace(c); c = l.next() {
 		s += string(c)
 	}
 	l.rewind()
-	return s
+
+	return &Token{Type: Whitespace, Value: s}
 }
 
-func (l *Lexer) lexSeparator() (s string) {
+func (l *Lexer) lexSeparator() *Token {
+	var s string
+
 	for c := l.next(); isSeparator(c); c = l.next() {
 		s += string(c)
 	}
 	l.rewind()
-	return s
+
+	return &Token{Type: Separator, Value: s}
 }
 
-func (l *Lexer) lexComments() (s string) {
+func (l *Lexer) lexComments() *Token {
+	var s string
+
 	for c := l.next(); !isEOL(c); c = l.next() {
 		s += string(c)
 	}
 	l.rewind()
-	return s
+
+	return &Token{Type: Comment, Value: s}
 }
 
-func (l *Lexer) lexWord() (s string) {
+func (l *Lexer) lexWord() *Token {
+	var s string
+
 	for c := l.next(); !isSeparator(c) && !isEOL(c) && !isEOF(c); c = l.next() {
 		s += string(c)
 	}
 	l.rewind()
-	return s
+
+	is := isSection(s)
+	ik := isKeyword(s)
+
+	if is || ik {
+		t := Section
+		if ik {
+			t = Keyword
+		}
+		return &Token{Type: t, Value: s}
+	}
+
+	return &Token{Type: Illegal, Value: s}
 }
 
-func (l *Lexer) lexValue() (string, error) {
+func (l *Lexer) lexValue() *Token {
 	var inQuote = false
 	var s string
+
 	c := l.next()
+
 	for {
 		if isDoubleQuote(c) {
 			inQuote = !inQuote
@@ -114,19 +139,25 @@ func (l *Lexer) lexValue() (string, error) {
 	l.rewind()
 
 	if inQuote {
-		return "", ErrUnclosedQuote
+		return &Token{Type: Err, Value: ErrUnclosedQuote.Error()}
 	}
 
-	return s, nil
+	return &Token{Type: Value, Value: s}
 }
 
-func (l *Lexer) lexChar() string {
+func (l *Lexer) lexEOL() *Token {
 	c := l.next()
-	return string(c)
+	return &Token{Type: EOL, Value: string(c)}
+}
+
+func (l *Lexer) lexEOF() *Token {
+	c := l.next()
+	return &Token{Type: EOF, Value: string(c)}
 }
 
 // Lex performs the lexical analysis of the input text
 // Tokens will be send over the channel returned by this method
+// until it reaches the end of the string
 func (l *Lexer) Lex() chan *Token {
 	var es bool // are we expecting a separator?
 	var ev bool // are we expecting a value?
@@ -135,51 +166,38 @@ func (l *Lexer) Lex() chan *Token {
 		if es && isSeparator(r) {
 			es = false
 			ev = true // next token must be a value
-			return &Token{Type: Separator, Value: l.lexSeparator()}
-		}
-
-		if ev {
-			v, err := l.lexValue()
-			ev = false
-
-			if err != nil {
-				return &Token{Type: Err, Value: err.Error()}
-			}
-			return &Token{Type: Value, Value: v}
+			return l.lexSeparator()
 		}
 
 		if isWhitespace(r) || isHash(r) || isEOL(r) || isEOF(r) {
 			if ev || es {
-				return &Token{Type: Illegal, Value: l.lexChar()}
+				return &Token{Type: Illegal, Value: string(l.next())}
 			}
 			if isWhitespace(r) {
-				return &Token{Type: Whitespace, Value: l.lexWhitespaces()}
+				return l.lexWhitespaces()
 			}
 			if isHash(r) {
-				return &Token{Type: Comment, Value: l.lexComments()}
+				return l.lexComments()
 			}
 			if isEOL(r) {
-				return &Token{Type: EOL, Value: l.lexChar()}
+				return l.lexEOL()
 			}
 			if isEOF(r) {
-				return &Token{Type: EOF, Value: l.lexChar()}
+				return l.lexEOF()
 			}
 		}
 
-		w := l.lexWord()
+		if ev {
+			ev = false
+			return l.lexValue()
+		}
 
-		is := isSection(w)
-		ik := isKeyword(w)
+		t := l.lexWord()
 
-		if is || ik {
-			t := Section
-			if ik {
-				t = Keyword
-			}
+		if t.IsKeyword() || t.IsSection() {
 			es = true // next token must be a separator
-			return &Token{Type: t, Value: w}
 		}
-		return &Token{Type: Illegal, Value: w}
+		return t
 	}
 
 	out := make(chan *Token)

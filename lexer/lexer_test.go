@@ -71,7 +71,7 @@ func TestPeek(t *testing.T) {
 	assert.Equal(t, '界', got, "Runes don't match")
 }
 
-func TestTabsAndSpaces(t *testing.T) {
+func TestWhitespaces(t *testing.T) {
 	cases := []struct {
 		input string
 		want  string
@@ -85,7 +85,8 @@ func TestTabsAndSpaces(t *testing.T) {
 	for i, tc := range cases {
 		l := Lexer{input: tc.input}
 		got := l.lexWhitespaces()
-		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
+		assert.Equal(t, Whitespace, got.Type, "Test Case %d %v", i, tc)
+		assert.Equal(t, tc.want, got.Value, "Test Case %d %v", i, tc)
 	}
 }
 
@@ -101,50 +102,52 @@ func TestComments(t *testing.T) {
 	for i, tc := range cases {
 		l := Lexer{input: tc.input}
 		got := l.lexComments()
-		e := l.next()
-		assert.Equal(t, eol, e, "Test Case %d %v", i, tc)
-		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
+		assert.Equal(t, Comment, got.Type, "Test Case %d %v", i, tc)
+		assert.Equal(t, tc.want, got.Value, "Test Case %d %v", i, tc)
 	}
 }
 
 func TestWord(t *testing.T) {
 	cases := []struct {
 		input string
-		want  string
+		want1 string
+		want2 Type
 	}{
-		{`foo`, "foo"},
-		{"bar foo", "bar"},
+		{"Host", "Host", Section},
+		{"User", "User", Keyword},
+		{"foo", "foo", Illegal},
 	}
 
 	for i, tc := range cases {
 		l := Lexer{input: tc.input}
 		got := l.lexWord()
-		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
+		assert.Equal(t, tc.want1, got.Value, "Test Case %d %v", i, tc)
+		assert.Equal(t, tc.want2, got.Type, "Test Case %d %v", i, tc)
 	}
 }
 
 func TestValues(t *testing.T) {
 	cases := []struct {
 		input string
-		want  string
-		err   error
+		want1 string
+		want2 Type
 	}{
 		{`foo
-`, "foo", nil},
-		{`foo # comment`, "foo", nil},
-		{"\"foo # comment\"", "\"foo # comment\"", nil},
+`, "foo", Value},
+		{`foo # comment`, "foo", Value},
+		{"\"foo # comment\"", "\"foo # comment\"", Value},
 		{`bar foo
-`, "bar foo", nil},
+`, "bar foo", Value},
 		{`"foo bar" foo, baz
-`, "\"foo bar\" foo, baz", nil},
-		{`"bar foo, baz`, "", ErrUnclosedQuote},
+`, "\"foo bar\" foo, baz", Value},
+		{`"bar foo, baz`, ErrUnclosedQuote.Error(), Err},
 	}
 
 	for i, tc := range cases {
 		l := Lexer{input: tc.input}
-		got, err := l.lexValue()
-		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
-		assert.Equal(t, err, tc.err, "Test Case %d %v", i, tc)
+		got := l.lexValue()
+		assert.Equal(t, tc.want1, got.Value, "Test Case %d %v", i, tc)
+		assert.Equal(t, tc.want2, got.Type, "Test Case %d %v", i, tc)
 	}
 }
 
