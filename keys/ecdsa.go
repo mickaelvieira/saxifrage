@@ -9,9 +9,9 @@ import (
 )
 
 var ecdsaSizes = map[string]elliptic.Curve{
-	"224": elliptic.P224(),
 	"256": elliptic.P256(),
 	"384": elliptic.P384(),
+	"521": elliptic.P521(),
 }
 
 // ECDSAKeySize ECDSA complexity implementation

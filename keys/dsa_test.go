@@ -1,13 +1,14 @@
 package keys
 
 import (
+	"crypto/dsa"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDSAGenPrivateKey(t *testing.T) {
-	gen := &DSAGenerator{}
+	gen := &DSAGenerator{ks: dsa.L1024N160}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)
 }
@@ -19,7 +20,7 @@ func TestDSAGenPublicKeyWithoutPrivateKey(t *testing.T) {
 }
 
 func TestDSAGenPublicKey(t *testing.T) {
-	gen := &DSAGenerator{}
+	gen := &DSAGenerator{ks: dsa.L1024N160}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)
 

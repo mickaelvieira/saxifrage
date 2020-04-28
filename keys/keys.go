@@ -29,6 +29,7 @@ const (
 	INVALID Type = "invalid"
 )
 
+// Options keys options
 type Options struct {
 	KeyType    Type
 	Host       string

@@ -13,7 +13,7 @@ func TestRSAGenPrivateKeyNoBitSize(t *testing.T) {
 }
 
 func TestRSAGenPrivateKey(t *testing.T) {
-	gen := &RSAGenerator{bitSize: 64}
+	gen := &RSAGenerator{ks: 64}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)
 }
@@ -25,7 +25,7 @@ func TestRSAGenPublicKeyWithoutPrivateKey(t *testing.T) {
 }
 
 func TestRSAGenPublicKey(t *testing.T) {
-	gen := &RSAGenerator{bitSize: 64}
+	gen := &RSAGenerator{ks: 64}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)
 

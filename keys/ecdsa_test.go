@@ -1,13 +1,14 @@
 package keys
 
 import (
+	"crypto/elliptic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestECDSAGenPrivateKey(t *testing.T) {
-	gen := &ECDSAGenerator{}
+	gen := &ECDSAGenerator{ks: elliptic.P256()}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)
 }
@@ -19,7 +20,7 @@ func TestECDSAGenPublicKeyWithoutPrivateKey(t *testing.T) {
 }
 
 func TestECDSAGenPublicKey(t *testing.T) {
-	gen := &ECDSAGenerator{}
+	gen := &ECDSAGenerator{ks: elliptic.P256()}
 	_, err := gen.GenPrivateKey()
 	assert.Nil(t, err)
 
