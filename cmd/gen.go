@@ -14,24 +14,18 @@ import (
 )
 
 const (
-	msgConfirmOverride    = "The key already exists. Do you want to override it"
-	msgConfirmContinue    = "Do you want to continue"
-	msgConfirmAddition    = "Do you want to add this key to your config file"
-	msgPromptKeyType      = "Select the type of key you want to generate"
-	msgPromptKeyDirectory = "Enter the directory"
-	msgPromptKeyFilename  = "Enter the file name"
-	msgPromptKeyHost      = "Enter the host to which you want to associate this key"
+	msgConfirmOverride     = "The key already exists. Do you want to override it"
+	msgConfirmContinue     = "Do you want to continue"
+	msgConfirmAddition     = "Do you want to add this key to your config file"
+	msgPromptKeyType       = "Select the type of key you want to generate"
+	msgPromptKeyComplexity = "Select the key complexity"
+	msgPromptKeyDirectory  = "Enter the directory"
+	msgPromptKeyFilename   = "Enter the file name"
+	msgPromptKeyPassphrase = "Enter the passphrase"
+	msgPromptKeyHost       = "Enter the host to which you want to associate this key"
 )
 
-type options struct {
-	KeyType    keys.Type
-	Host       string
-	PrivateKey string
-	PublicKey  string
-	Directory  string
-}
-
-func askForKeyType(o *options) error {
+func askForKeyType(o *keys.Options) error {
 	s := promptui.Select{
 		Label:        msgPromptKeyType,
 		Items:        keys.Types,
@@ -52,7 +46,35 @@ func askForKeyType(o *options) error {
 	return nil
 }
 
-func askForKeyDirectory(o *options) error {
+func askForKeySize(o *keys.Options) error {
+	keySizes := keys.GetKeySize(o.KeyType)
+	values := keySizes.GetValues()
+
+	if len(values) == 0 {
+		return nil
+	}
+
+	s := promptui.Select{
+		Label:        msgPromptKeyComplexity,
+		Items:        values,
+		HideSelected: true,
+	}
+
+	_, r, err := s.Run()
+	if err != nil {
+		return err
+	}
+
+	v := keySizes.GetValue(r)
+	if v == nil {
+		return keys.ErrInvalidKeySize
+	}
+	o.KeySize = v
+
+	return nil
+}
+
+func askForKeyDirectory(o *keys.Options) error {
 	o.Directory = keys.GetDir("")
 
 	r, err := prompt.Prompt(msgPromptKeyDirectory, o.Directory)
@@ -66,7 +88,17 @@ func askForKeyDirectory(o *options) error {
 	return nil
 }
 
-func askForKeyHost(o *options) error {
+func askForKeyPassPhrase(o *keys.Options) error {
+	r, err := prompt.Prompt(msgPromptKeyPassphrase, "")
+	if err != nil {
+		return err
+	}
+	o.PassPhrase = r
+
+	return nil
+}
+
+func askForKeyHost(o *keys.Options) error {
 	r, err := prompt.Prompt(msgPromptKeyHost, "")
 	if err != nil {
 		return err
@@ -76,7 +108,7 @@ func askForKeyHost(o *options) error {
 	return nil
 }
 
-func askForKeyName(o *options) error {
+func askForKeyName(o *keys.Options) error {
 	s, _ := keys.GetFilenamesFromType(o.KeyType)
 	r, err := prompt.Prompt(msgPromptKeyFilename, s)
 	if err != nil {
@@ -95,7 +127,7 @@ func askForKeyName(o *options) error {
 }
 
 func runGen(a *App) error {
-	o := &options{}
+	o := &keys.Options{}
 	if err := askForKeyType(o); err != nil {
 		return err
 	}
@@ -105,6 +137,13 @@ func runGen(a *App) error {
 	if err := askForKeyName(o); err != nil {
 		return err
 	}
+	if err := askForKeyPassPhrase(o); err != nil {
+		return err
+	}
+	if err := askForKeySize(o); err != nil {
+		return err
+	}
+
 	if err := template.Output("summary", o); err != nil {
 		return err
 	}
@@ -129,7 +168,7 @@ func runGen(a *App) error {
 			return err
 		}
 
-		g := keys.GetGenerator(o.KeyType)
+		g := keys.GetGenerator(o)
 
 		privateKey, err := g.GenPrivateKey()
 		if err != nil {

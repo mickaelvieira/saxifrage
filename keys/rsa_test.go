@@ -9,7 +9,7 @@ import (
 func TestRSAGenPrivateKeyNoBitSize(t *testing.T) {
 	gen := &RSAGenerator{}
 	_, err := gen.GenPrivateKey()
-	assert.Equal(t, ErrBitSizeNotSpecified, err)
+	assert.Equal(t, ErrKeySizeNotValid, err)
 }
 
 func TestRSAGenPrivateKey(t *testing.T) {

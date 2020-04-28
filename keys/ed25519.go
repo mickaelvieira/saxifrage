@@ -7,10 +7,28 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// ED25519KeySize ED25519 complexity implementation
+type ED25519KeySize struct{}
+
+// GetDefault returns the default complexity
+func (c *ED25519KeySize) GetDefault() string {
+	return ""
+}
+
+// GetValues returns the available complexity values
+func (c *ED25519KeySize) GetValues() []string {
+	return make([]string, 0)
+}
+
+// GetValue returns the complexity value
+func (c *ED25519KeySize) GetValue(s string) interface{} {
+	return nil
+}
+
 // ED25519Generator generates RSA private and public keys
 type ED25519Generator struct {
-	bitSize int
-	pk      ed25519.PublicKey
+	pwd string
+	pk  ed25519.PublicKey
 }
 
 // GenPublicKey ...
@@ -29,12 +47,12 @@ func (g *ED25519Generator) GenPublicKey() ([]byte, error) {
 
 // GenPrivateKey ...
 func (g *ED25519Generator) GenPrivateKey() ([]byte, error) {
-	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader) // @TODO We should allow other curses
+	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return nil, err
 	}
 
 	g.pk = publicKey
 
-	return EncodeToPEM(privateKey)
+	return EncodeToPEM(privateKey, g.pwd)
 }

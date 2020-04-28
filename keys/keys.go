@@ -5,12 +5,15 @@ import (
 	"crypto/dsa"
 	"crypto/ecdsa"
 	"crypto/ed25519"
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/asn1"
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -25,6 +28,16 @@ const (
 	ED25519 Type = "ed25519"
 	INVALID Type = "invalid"
 )
+
+type Options struct {
+	KeyType    Type
+	Host       string
+	PassPhrase string
+	PrivateKey string
+	PublicKey  string
+	Directory  string
+	KeySize    interface{}
+}
 
 // Types contains the list of key types
 var Types = []Type{RSA, DSA, ECDSA, ED25519}
@@ -47,9 +60,10 @@ func TypesToString() string {
 // Keys errors
 var (
 	ErrNotImplementedKeyType  = errors.New("This type of key is not yet implemented")
+	ErrInvalidKeySize         = errors.New("Invalid key size")
 	ErrInvalidKeyType         = errors.New("Invalid key type. Type should be equal to rsa, dsa, ecdsa or ed25519")
 	ErrPrivateKeyNotGenerated = errors.New("Private key must be generated before generating the public key")
-	ErrBitSizeNotSpecified    = errors.New("bitsize value was not set")
+	ErrKeySizeNotValid        = errors.New("key size is not valid")
 	ErrKeyOverrideNotAllowed  = errors.New("Overriding the key is not allowed")
 )
 
@@ -63,56 +77,60 @@ func GetKeyType(i string) Type {
 	return INVALID
 }
 
+func sortKeySizeValues(v []string) []string {
+	sort.Slice(v, func(i, j int) bool {
+		i1, err := strconv.Atoi(v[i])
+		if err != nil {
+			panic(err)
+		}
+		i2, err := strconv.Atoi(v[j])
+		if err != nil {
+			panic(err)
+		}
+		return i1 > i2
+	})
+	return v
+}
+
 // EncodeToPEM ...
 // https://golang.org/pkg/encoding/pem/#Block
-func EncodeToPEM(privateKey crypto.PrivateKey) ([]byte, error) {
+func EncodeToPEM(privateKey crypto.PrivateKey, pwd string) ([]byte, error) {
 	var der []byte
+	var err error
 	var blk *pem.Block
 
 	switch sk := privateKey.(type) {
 	case *rsa.PrivateKey:
 		der = x509.MarshalPKCS1PrivateKey(sk)
-		blk = &pem.Block{
-			Type:  "RSA PRIVATE KEY",
-			Bytes: der,
-		}
+		blk = &pem.Block{Type: "RSA PRIVATE KEY", Bytes: der}
 	case *ecdsa.PrivateKey:
-		der, err := x509.MarshalECPrivateKey(sk)
+		der, err = x509.MarshalECPrivateKey(sk)
 		if err != nil {
 			return nil, err
 		}
-		blk = &pem.Block{
-			Type:  "EC PRIVATE KEY",
-			Bytes: der,
-		}
+		blk = &pem.Block{Type: "EC PRIVATE KEY", Bytes: der}
 	case *dsa.PrivateKey:
-		der, err := asn1.Marshal(sk.PublicKey)
+		der, err = asn1.Marshal(sk.PublicKey)
 		if err != nil {
 			return nil, err
 		}
-		blk = &pem.Block{
-			Type:  "PUBLIC KEY",
-			Bytes: der,
-		}
+		blk = &pem.Block{Type: "PUBLIC KEY", Bytes: der}
 	case ed25519.PrivateKey:
-		der, err := x509.MarshalPKCS8PrivateKey(sk)
+		der, err = x509.MarshalPKCS8PrivateKey(sk)
 		if err != nil {
 			return nil, err
 		}
-		blk = &pem.Block{
-			Type:  "OPENSSH PRIVATE KEY",
-			Bytes: der,
-		}
+		blk = &pem.Block{Type: "OPENSSH PRIVATE KEY", Bytes: der}
 	default:
 		return nil, fmt.Errorf("Invalid KEY type %v", sk)
 	}
 
+	if pwd != "" {
+		blk, err = x509.EncryptPEMBlock(rand.Reader, blk.Type, blk.Bytes, []byte(pwd), x509.PEMCipherAES256)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return pem.EncodeToMemory(blk), nil
 }
-
-// type Options struct {
-// 	Type       Type
-// 	PrivateKey string
-// 	PublicKey  string
-// 	Directory  string
-// }
