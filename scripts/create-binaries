@@ -1,0 +1,63 @@
+#!/bin/bash
+# shellcheck disable=SC2155
+
+set -e -u -o pipefail
+# set -x
+
+info() {
+    printf "\\x1b[32m\\xE2\\x87\\x92 %s\\x1b[0m\\n" "$1"
+}
+
+error() {
+    printf "\\x1b[97m\\x1b[41m\\x21\\x1b[0m \\x1b[31m%s\\x1b[0m\\n" "$1" 1>&2
+    exit 1
+}
+
+declare -r long="./saxifrage"
+declare -r short="./sax"
+declare -r oses=(linux darwin)
+declare -r arches=(amd64)
+
+clean_zip() {
+    for os in ${oses[*]}; do
+        for arch in ${arches[*]}; do
+            local file="./saxifrage-${os}-${arch}.zip"
+            if [[ -f $file ]]; then
+                rm "$file"
+            fi
+        done
+    done
+}
+
+clean_bin() {
+    if [[ -f $long ]]; then
+        rm "$long"
+    fi
+    if [[ -f $short ]]; then
+        rm "$short"
+    fi
+}
+
+main() {
+    clean_bin
+    clean_zip
+
+    for os in ${oses[*]}; do
+        for arch in ${arches[*]}; do
+            info "Creating binary ${short} - OS: ${os}, Arch: ${arch}"
+
+            export GOOS=${os}
+            export GOARCH=${arch}
+            make
+            mv $long $short
+
+            archive="saxifrage-${os}-${arch}.zip"
+            info "Creating archive ${archive}"
+
+            zip "$archive" $short
+            clean_bin 2> /dev/null
+        done
+    done
+}
+
+main
