@@ -6,32 +6,24 @@ A CLI tool to manage your SSH keys
 
 ## Install
 
-```sh
-go get github.com/mickaelvieira/saxifrage
-```
-
-You can rename the binary if you prefer using a shorter command. Bear in mind that you will have to rename it after each update.
+Download the latest version corresponding to your platform from the [releases](https://github.com/mickaelvieira/saxifrage/releases) page
 
 ```sh
-mv $(go env GOPATH)/bin/saxifrage $(go env GOPATH)/bin/sax
-```
-
-## Update
-
-```sh
-go get -u github.com/mickaelvieira/saxifrage
+$ unzip saxifrage-linux-amd64.zip
+$ sudo mv sax /usr/local/bin/
+$ sudo chmod u+x /usr/local/bin/sax
 ```
 
 ## Usage
 
 ```sh
-$ saxifrage
+$ sax
 
  NAME:
-  saxifrage - A CLI tool to manage your SSH keys
+  sax - A CLI tool to manage your SSH keys
 
  USAGE:
-  saxifrage [command]
+  sax [command]
 
  COMMANDS:
 
