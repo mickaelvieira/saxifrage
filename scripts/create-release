@@ -82,11 +82,11 @@ main() {
     if [[ "$answer" == y ]]; then
         info "Calling Github API..."
         curl -v \
-          -X POST \
-          -H "Content-Type: application/json" \
-          -H "Authorization: token $token" \
-          --data "$payload" \
-          "$endpoint"
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token $token" \
+            --data "$payload" \
+            "$endpoint"
     else
         info "skipped!"
     fi
