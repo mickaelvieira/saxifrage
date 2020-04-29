@@ -1,0 +1,64 @@
+#!/bin/bash
+# shellcheck disable=SC2155
+
+set -e -u -o pipefail
+# set -x
+
+declare -r WD="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+declare -r VERSION_FILE="$WD/.github/.version"
+
+info() {
+    printf "\\x1b[32m\\xE2\\x87\\x92 %s\\x1b[0m\\n" "$1"
+}
+
+error() {
+    printf "\\x1b[97m\\x1b[41m\\x21\\x1b[0m \\x1b[31m%s\\x1b[0m\\n" "$1" 1>&2
+    exit 1
+}
+
+get_tag() {
+    local version
+    if [[ -f "$VERSION_FILE" ]]; then
+        version=$(cat "$VERSION_FILE")
+    fi
+    echo "v$version"
+}
+
+get_branch() {
+    git branch | grep -E "^\\*" | awk '{print $2}'
+}
+
+get_confirmation_message() {
+    local branch=$1
+    local tag=$2
+
+    cat <<EOM
+You are about to tag:
+- Branch: \\x1b[33m${branch}\\x1b[0m
+- Tag: \\x1b[33m${tag}\\x1b[0m
+
+Do you want to proceed [y/N]:
+EOM
+}
+
+main() {
+    local branch=$(get_branch)
+    local tag=$(get_tag)
+
+    [[ "$branch" != master ]] && error "Your are not on the master branch mate."
+
+    local message=$(get_confirmation_message "$branch" "$tag")
+
+    read -erp "$(echo -e "$message")" answer
+
+    [[ -z "$answer" ]] && answer="n"
+
+    if [[ "$answer" == y ]]; then
+        git tag "$tag"
+        git push origin "$tag"
+    else
+        info "skipped!"
+    fi
+}
+
+main
