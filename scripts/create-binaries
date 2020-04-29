@@ -13,8 +13,8 @@ error() {
     exit 1
 }
 
-declare -r long="./saxifrage"
-declare -r short="./sax"
+declare -r long_name="./saxifrage"
+declare -r short_name="./sax"
 declare -r oses=(linux darwin)
 declare -r arches=(amd64)
 
@@ -30,11 +30,11 @@ clean_zip() {
 }
 
 clean_bin() {
-    if [[ -f $long ]]; then
-        rm "$long"
+    if [[ -f $long_name ]]; then
+        rm "$long_name"
     fi
-    if [[ -f $short ]]; then
-        rm "$short"
+    if [[ -f $short_name ]]; then
+        rm "$short_name"
     fi
 }
 
@@ -44,18 +44,22 @@ main() {
 
     for os in ${oses[*]}; do
         for arch in ${arches[*]}; do
-            info "Creating binary ${short} - OS: ${os}, Arch: ${arch}"
+            info "Creating binary ${short_name} - OS: ${os}, Arch: ${arch}"
 
             export GOOS=${os}
             export GOARCH=${arch}
+
             make
-            mv $long $short
+
+            mv $long_name $short_name
 
             archive="saxifrage-${os}-${arch}.zip"
+
             info "Creating archive ${archive}"
 
-            zip "$archive" $short
-            clean_bin 2> /dev/null
+            zip "$archive" $short_name
+
+            clean_bin
         done
     done
 }
