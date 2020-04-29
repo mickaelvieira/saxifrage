@@ -11,6 +11,9 @@ GO_LDFLAGS  := -ldflags "-s -w -X main.version=$(APP_VERSION)"
 build:
 	CGO_ENABLED=0 go build $(GO_LDFLAGS)
 
+binaries:
+	./scripts/create-binaries
+
 run:
 	CGO_ENABLED=0 go run sax.go
 
