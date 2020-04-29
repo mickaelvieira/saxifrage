@@ -63,36 +63,32 @@ func (l *tokenizer) newLine() {
 	l.column = 1
 }
 
-func (l *tokenizer) lexWhitespaces() *Token {
-	var s string
-
-	for c := l.next(); isWhitespace(c); c = l.next() {
+func (l *tokenizer) lexWhile(predicate func(rune) bool) (s string) {
+	for c := l.next(); predicate(c); c = l.next() {
 		s += string(c)
 	}
 	l.rewind()
+	return s
+}
 
+func (l *tokenizer) lexWhitespaces() *Token {
+	s := l.lexWhile(func(c rune) bool {
+		return isWhitespace(c)
+	})
 	return &Token{Type: Whitespace, Value: s}
 }
 
 func (l *tokenizer) lexSeparator() *Token {
-	var s string
-
-	for c := l.next(); isSeparator(c); c = l.next() {
-		s += string(c)
-	}
-	l.rewind()
-
+	s := l.lexWhile(func(c rune) bool {
+		return isSeparator(c)
+	})
 	return &Token{Type: Separator, Value: s}
 }
 
 func (l *tokenizer) lexComments() *Token {
-	var s string
-
-	for c := l.next(); !isEOL(c); c = l.next() {
-		s += string(c)
-	}
-	l.rewind()
-
+	s := l.lexWhile(func(c rune) bool {
+		return !isEOL(c)
+	})
 	return &Token{Type: Comment, Value: s}
 }
 
@@ -100,12 +96,9 @@ func (l *tokenizer) lexWord() *Token {
 	var col = l.column
 	var line = l.line
 
-	var s string
-
-	for c := l.next(); !isSeparator(c) && !isEOL(c) && !isEOF(c); c = l.next() {
-		s += string(c)
-	}
-	l.rewind()
+	s := l.lexWhile(func(c rune) bool {
+		return !isSeparator(c) && !isEOL(c) && !isEOF(c)
+	})
 
 	is := isSection(s)
 	ik := isKeyword(s)
