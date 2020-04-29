@@ -2,7 +2,7 @@
 # shellcheck disable=SC2155
 
 set -e -u -o pipefail
-set -x
+# set -x
 
 declare -r WD="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 declare -r VERSION_FILE="$WD/.github/.version"
