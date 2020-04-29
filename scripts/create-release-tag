@@ -52,7 +52,7 @@ get_confirmation_message() {
     local version=$2
 
     cat <<EOM
-You are about to create a new release:
+You are about to create a new release tag:
 - Branch: \\x1b[33m${branch}\\x1b[0m
 - Version: \\x1b[33m${version}\\x1b[0m
 
@@ -82,11 +82,11 @@ main() {
     if [[ "$answer" == y ]]; then
         info "Calling Github API..."
         curl -v \
-          -X POST \
-          -H "Content-Type: application/json" \
-          -H "Authorization: token $token" \
-          --data "$payload" \
-          "$endpoint"
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token $token" \
+            --data "$payload" \
+            "$endpoint"
     else
         info "skipped!"
     fi

@@ -28,8 +28,22 @@ get_branch() {
     git branch | grep -E "^\\*" | awk '{print $2}'
 }
 
+get_access_token() {
+    local file=$1
+    cat "$file"
+}
+
+get_payload() {
+    local branch=$1
+    cat <<EOM
+{
+  "default_branch": "$branch"
+}
+EOM
+}
+
 update_version() {
-    echo "$1" > "$VERSION_FILE"
+    echo "$1" >"$VERSION_FILE"
 }
 
 get_next_branch_message() {
@@ -54,19 +68,19 @@ split_version() {
 
 get_next_major_version() {
     local numbers=()
-    IFS=" " read -r -a numbers <<< "$(split_version "$1")"
+    IFS=" " read -r -a numbers <<<"$(split_version "$1")"
     [[ ${#numbers[@]} -eq 3 ]] && echo "$((numbers[0] + 1)).0.0"
 }
 
 get_next_minor_version() {
     local numbers=()
-    IFS=" " read -r -a numbers <<< "$(split_version "$1")"
+    IFS=" " read -r -a numbers <<<"$(split_version "$1")"
     [[ ${#numbers[@]} -eq 3 ]] && echo "${numbers[0]}.$((numbers[1] + 1)).0"
 }
 
 get_next_patch_version() {
     local numbers=()
-    IFS=" " read -r -a numbers <<< "$(split_version "$1")"
+    IFS=" " read -r -a numbers <<<"$(split_version "$1")"
     [[ ${#numbers[@]} -eq 3 ]] && echo "${numbers[0]}.${numbers[1]}.$((numbers[2] + 1))"
 }
 
@@ -77,22 +91,30 @@ ask_for_version_number() {
 
 create_next_release_branch() {
     local version=$1
+    local owner="mickaelvieira"
+    local repo="saxifrage"
+    local endpoint="https://api.github.com/repos/$owner/$repo"
     local major=$(get_next_major_version "$version")
     local minor=$(get_next_minor_version "$version")
     local patch=$(get_next_patch_version "$version")
+    local credentials="$WD/.github/.access_token"
+
+    [[ -f "$credentials" ]] || error "Access Token file does not exist"
 
     read -erp "$(echo -e "$(get_next_branch_message "$major" "$minor" "$patch")") " next_branch
 
     local branch_prefix="release/"
     local version=
     case $next_branch in
-        1) version="${major}";;
-        2) version="${minor}";;
-        3) version="${patch}";;
-        4) version="$(ask_for_version_number)"
+    1) version="${major}" ;;
+    2) version="${minor}" ;;
+    3) version="${patch}" ;;
+    4) version="$(ask_for_version_number)" ;;
     esac
 
     local branch_name="${branch_prefix}${version}"
+    local token=$(get_access_token "$credentials")
+    local payload=$(get_payload "$branch_name")
 
     if [[ -n "${branch_name}" ]]; then
 
@@ -106,6 +128,12 @@ create_next_release_branch() {
             git add "$VERSION_FILE"
             git commit -m "Update application's version"
             git push
+            curl -v \
+                -X PATCH \
+                -H "Content-Type: application/json" \
+                -H "Authorization: token $token" \
+                --data "$payload" \
+                "$endpoint"
         fi
     else
         info "Skipped!"
