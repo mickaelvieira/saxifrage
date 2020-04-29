@@ -1,4 +1,4 @@
-name: Saxifrage
+name: Saxifrage Checks
 on:
   push:
     branches:

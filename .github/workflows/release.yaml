@@ -1,3 +1,4 @@
+name: Saxifrage Releases
 on:
   push:
     tags:
