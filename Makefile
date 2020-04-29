@@ -8,11 +8,14 @@ GOSEC       := gosec --quiet
 APP_VERSION := $(shell cat .github/.version)
 GO_LDFLAGS  := -ldflags "-s -w -X main.version=$(APP_VERSION)"
 
-run:
-	CGO_ENABLED=0 go run sax.go
-
 build:
 	CGO_ENABLED=0 go build $(GO_LDFLAGS)
+
+binaries:
+	./scripts/create-binaries
+
+run:
+	CGO_ENABLED=0 go run sax.go
 
 test:
 	CGO_ENABLED=0 go test ./...
