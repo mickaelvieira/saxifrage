@@ -30,6 +30,20 @@ func GetDir(path string) string {
 	return filepath.Join(os.Getenv("HOME"), ".ssh", path)
 }
 
+// Writekeys writes keys to files
+func Writekeys(publicKey []byte, privateKey []byte, opts *Options) error {
+	if err := MakeDir(opts.Directory); err != nil {
+		return err
+	}
+	if err := WriteToFile(privateKey, opts.PrivateKey); err != nil {
+		return err
+	}
+	if err := WriteToFile(publicKey, opts.PublicKey); err != nil {
+		return err
+	}
+	return nil
+}
+
 // WriteToFile writes the key to a file
 func WriteToFile(b []byte, path string) error {
 	err := ioutil.WriteFile(filepath.Clean(path), b, 0600)

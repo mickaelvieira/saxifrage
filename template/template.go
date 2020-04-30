@@ -35,8 +35,9 @@ func Line(l int) string {
 var (
 	configTemplate = `
 Host {{ .Host }}
-    PreferredAuthentications publickey
-    IdentityFile {{ .PrivateKey }}
+{{ if .User }}    User {{ .User }}{{ end }}
+    Port {{ .Port }}
+    IdentityFile {{ .IdentityFile }}
 `
 	helpTemplate = `
  NAME:

@@ -1,27 +1,27 @@
 package lexer
 
-// Type lexer token type
-type Type int
+// TokenType lexer token type
+type TokenType int
 
 // Lexer tokens
 const (
-	Illegal    Type = iota // A illegal token is returned when an unexpected token is encounter
-	Err                    // A token is returned when an error is found during lexing
-	EOF                    // the end of the file
-	EOL                    // the end of a line
-	Section                // either Host or Match section
-	Keyword                // a keyword (AddressFamily, BatchMode, BindAddress, etc...)
-	Separator              // either a space or equal sign to separate keywords and values
-	Value                  // the value of a keyword or a section
-	Whitespace             // a sequence of blank characters, either spaces or tabs
-	Comment                // a comment
+	Illegal    TokenType = iota // A illegal token is returned when an unexpected token is encounter
+	Err                         // A token is returned when an error is found during lexing
+	EOF                         // the end of the file
+	EOL                         // the end of a line
+	Section                     // either Host or Match section
+	Keyword                     // a keyword (AddressFamily, BatchMode, BindAddress, etc...)
+	Separator                   // either a space or equal sign to separate keywords and values
+	Value                       // the value of a keyword or a section
+	Whitespace                  // a sequence of blank characters, either spaces or tabs
+	Comment                     // a comment
 )
 
 // Token is a token returned by the lexer.
 // It has a type and a value representing
 // the sequence of characters found in the input string
 type Token struct {
-	Type  Type
+	Type  TokenType
 	Value string
 }
 

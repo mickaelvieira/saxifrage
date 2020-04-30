@@ -127,7 +127,8 @@ create_next_release_branch() {
             update_version "$version"
             git add "$VERSION_FILE"
             git commit -m "Update application's version"
-            git push
+            git push -u origin "$branch_name"
+
             curl -v \
                 -X PATCH \
                 -H "Content-Type: application/json" \

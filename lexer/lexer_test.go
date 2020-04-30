@@ -131,7 +131,7 @@ func TestWord(t *testing.T) {
 	cases := []struct {
 		input string
 		want1 string
-		want2 Type
+		want2 TokenType
 	}{
 		{"Host", "Host", Section},
 		{"User", "User", Keyword},
@@ -150,7 +150,7 @@ func TestValues(t *testing.T) {
 	cases := []struct {
 		input string
 		want1 string
-		want2 Type
+		want2 TokenType
 	}{
 		{`foo
 `, "foo", Value},
