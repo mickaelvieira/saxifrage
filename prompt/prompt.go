@@ -7,6 +7,21 @@ import (
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
+// Prompt messages
+const (
+	MsgConfirmOverride     = "The key already exists. Do you want to override it"
+	MsgConfirmContinue     = "Do you want to continue"
+	MsgConfirmAddition     = "Do you want to add this key to your config file"
+	MsgPromptKeyType       = "Select the type of key you want to generate"
+	MsgPromptKeyComplexity = "Select the key complexity"
+	MsgPromptKeyDirectory  = "Enter the directory"
+	MsgPromptKeyFilename   = "Enter the file name"
+	MsgPromptKeyPassphrase = "Enter the passphrase"
+	MsgPromptKeyHost       = "Enter the host to which you want to associate this key"
+	MsgPromptKeyPort       = "Enter the port"
+	MsgPromptKeyUser       = "Enter the user"
+)
+
 // Msg output a message in the console
 func Msg(m string) error {
 	o := struct {

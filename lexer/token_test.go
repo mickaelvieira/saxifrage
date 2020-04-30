@@ -69,7 +69,7 @@ func TestTokenIsMatchSection(t *testing.T) {
 func TestStringConvertion(t *testing.T) {
 	cases := []struct {
 		input string
-		t     Type
+		t     TokenType
 		want  string
 	}{
 		{string(rune(0)), EOF, "EOF"},
