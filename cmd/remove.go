@@ -81,13 +81,19 @@ func runRemove(a *App) error {
 			return err
 		}
 
-		confirm, err := prompt.Confirm(prompt.MsgConfirmDeleteLines)
+		r, err := prompt.Prompt(prompt.MsgConfirmDeleteLines, "ignore")
 		if err != nil {
 			return err
 		}
 
-		if confirm {
-			file.RemoveLinesWithNumbers(lines.GetNumbers())
+		if r == "d" {
+			file.RemoveLineNumbers(lines.GetNumbers())
+			if err := config.WriteToFile(file.Bytes()); err != nil {
+				return err
+			}
+		}
+		if r == "c" {
+			file.CommentLineNumbers(lines.GetNumbers())
 			if err := config.WriteToFile(file.Bytes()); err != nil {
 				return err
 			}

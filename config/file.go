@@ -29,8 +29,8 @@ type File struct {
 	Lines Lines
 }
 
-// RemoveLinesWithNumbers removes the lines from file with the provided numbers
-func (f *File) RemoveLinesWithNumbers(n []int) {
+// RemoveLineNumbers removes the lines from file with the provided numbers
+func (f *File) RemoveLineNumbers(n []int) {
 	var lines Lines
 
 	contains := func(e int) bool {
@@ -49,6 +49,24 @@ func (f *File) RemoveLinesWithNumbers(n []int) {
 	}
 
 	f.Lines = lines
+}
+
+// CommentLineNumbers comments the lines from file with the provided numbers
+func (f *File) CommentLineNumbers(n []int) {
+	contains := func(e int) bool {
+		for _, a := range n {
+			if a == e {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, l := range f.Lines {
+		if contains(l.Number) {
+			l.Comment()
+		}
+	}
 }
 
 // FindSectionLines ...

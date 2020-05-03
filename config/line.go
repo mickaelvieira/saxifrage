@@ -20,6 +20,12 @@ type Line struct {
 	tokens []*lexer.Token
 }
 
+// Comment comments the line out
+func (l *Line) Comment() {
+	c := &lexer.Token{Type: lexer.Comment, Value: "# "}
+	l.tokens = append([]*lexer.Token{c}, l.tokens...)
+}
+
 // String returns the line content as a string
 func (l *Line) String() (s string) {
 	for _, t := range l.tokens {
