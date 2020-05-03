@@ -80,39 +80,6 @@ type Section struct {
 	Options   Options
 }
 
-// GetKeyFiles returns the private and public keys paths
-// as well as their parent directory when the key is stored in a subdirectory
-// @TODO move this func out of the struct and test it properly
-func (s *Section) GetKeyFiles() []string {
-	files := make([]string, 0)
-	option := s.Options.Find("IdentityFile")
-
-	if option == nil {
-		return files
-	}
-
-	// @TODO there is a bug here
-	// The value might be between quotes
-
-	privateKey := ToAbsolutePath(option.Value)
-	publickey := privateKey + ".pub"
-	// directory := filepath.Dir(p)
-
-	// if _, err := os.Stat(privateKey); err == nil {
-	files = append(files, privateKey)
-	// }
-	// if _, err := os.Stat(privateKey); err == nil {
-	files = append(files, publickey)
-	// }
-
-	// https://stackoverflow.com/questions/30697324/how-to-check-if-directory-on-path-is-empty
-	// if !IsBaseSSHDirectory(directory) {
-	// 	f = append(f, directory)
-	// }
-
-	return files
-}
-
 // Options is a list of options
 type Options []*Option
 

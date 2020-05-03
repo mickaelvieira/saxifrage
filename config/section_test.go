@@ -1,7 +1,6 @@
 package config
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -108,45 +107,6 @@ func TestFilterSections(t *testing.T) {
 		return s.Matching == "foo"
 	})
 	assert.Equal(t, 0, len(got))
-}
-
-func TestSectionKeyFiles(t *testing.T) {
-
-	home := os.Getenv("HOME")
-
-	cases := []struct {
-		input string
-		want  []string
-	}{
-		{"~/.ssh/id_rsa", []string{
-			home + "/.ssh/id_rsa",
-			home + "/.ssh/id_rsa.pub",
-		}},
-		{"~/.ssh/foo/id_rsa", []string{
-			home + "/.ssh/foo/id_rsa",
-			home + "/.ssh/foo/id_rsa.pub",
-			// home + "/.ssh/foo",
-		}},
-		{"~/.ssh/baz/bar", []string{
-			home + "/.ssh/baz/bar",
-			home + "/.ssh/baz/bar.pub",
-			// home + "/.ssh/baz",
-		}},
-		// {"~/foo", []string{}},
-	}
-
-	for i, tc := range cases {
-		s := Section{}
-		s.Options = append(s.Options, NewOption("IdentityFile", " ", tc.input))
-
-		f := s.GetKeyFiles()
-
-		assert.Equal(t, len(tc.want), len(f), "Test Case %d [length] %v", i, tc)
-
-		for j, p := range tc.want {
-			assert.Equal(t, p, f[j], "Test Case %d [paths] %v", i, tc)
-		}
-	}
 }
 
 func TestFindOptions(t *testing.T) {

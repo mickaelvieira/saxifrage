@@ -3,7 +3,6 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 )
 
 // Files errors
@@ -147,14 +146,4 @@ func (f *File) Bytes() (b []byte) {
 // IsUserConfig identifies whether the file is the user local configuration
 func (f *File) IsUserConfig() bool {
 	return f.Path == GetUserConfigPath()
-}
-
-// WriteToFile writes the key to a file
-func WriteToFile(b []byte) error {
-	p := GetUserConfigPath()
-	err := ioutil.WriteFile(p, b, 0600)
-	if err != nil {
-		return err
-	}
-	return nil
 }

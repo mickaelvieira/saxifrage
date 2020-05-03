@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/manifoldco/promptui"
@@ -29,7 +28,7 @@ func runRemove(a *App) error {
 	}
 
 	s := promptui.Select{
-		Label:        "Pick a section",
+		Label:        prompt.MsgPromptChooseSection,
 		Items:        sections.GetMatchingValues(),
 		HideSelected: true,
 	}
@@ -45,9 +44,11 @@ func runRemove(a *App) error {
 	}
 
 	lines := file.FindSectionLines(section.Matching)
-	keys := section.GetKeyFiles()
+	keys, err := config.GetKeyFiles(section)
+	if err != nil {
+		return err
+	}
 
-	log.Println(keys)
 	d := struct {
 		KeyFiles []string
 		Lines    config.Lines
@@ -61,7 +62,7 @@ func runRemove(a *App) error {
 			return err
 		}
 
-		confirm, err := prompt.Confirm("Do you want to delete those files")
+		confirm, err := prompt.Confirm(prompt.MsgConfirmDeleteFiles)
 		if err != nil {
 			return err
 		}
@@ -80,7 +81,7 @@ func runRemove(a *App) error {
 			return err
 		}
 
-		confirm, err := prompt.Confirm("Do you want to delete those lines")
+		confirm, err := prompt.Confirm(prompt.MsgConfirmDeleteLines)
 		if err != nil {
 			return err
 		}

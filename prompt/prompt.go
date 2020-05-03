@@ -23,6 +23,9 @@ const (
 	MsgGeneratingKeys      = "Generating SSH keys..."
 	MsgKeyGenerated        = "The SSH keys were generated successfully!"
 	MsgConfigGenerated     = "The SSH key was added to your config file"
+	MsgPromptChooseSection = "Select the Host section you want to remove"
+	MsgConfirmDeleteFiles  = "Do you want to delete those files"
+	MsgConfirmDeleteLines  = "Do you want to delete those lines"
 )
 
 // Msg output a message in the console
