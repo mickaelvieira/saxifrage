@@ -79,7 +79,7 @@ func New(v string) *App {
 	a.Commands[0] = &command{Name: "gen", Usage: fmt.Sprintf("Generate interactively a SSH key (%s)", keys.TypesToString()), Action: runGen}
 	a.Commands[1] = &command{Name: "config", Usage: "Show your SSH configuration", Action: runConfig}
 	a.Commands[2] = &command{Name: "dump", Usage: "Dump your SSH configuration", Action: runDump}
-	a.Commands[3] = &command{Name: "remove", Usage: "Remove the configuration and the associated SSH key", Action: runRemove}
+	a.Commands[3] = &command{Name: "remove", Usage: "Remove interactively a section and its related SSH keys", Action: runRemove}
 	a.Commands[4] = &command{Name: "help", Usage: "Show this help", Action: runHelp}
 
 	return a
