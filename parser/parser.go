@@ -20,123 +20,50 @@ const (
 	msgNullSection         = "Cannot add options before declaring a section"
 )
 
-// Parser --
-type Parser struct {
+// parser --
+type parser struct {
 	// The last error triggered during parsing
 	lastError error
 
 	// The Tokenizer
 	tokenizer lexer.Tokenizer
 
-	// Sections gathers the sections
-	// built with the tokens received
-	// from the tokenizer
-	Sections config.Sections
-
-	// Tokens gathers all the tokens
-	// by the tokenizer
-	Tokens []*lexer.Token
+	// Lines contains the tokens grouped by line
+	Lines config.Lines
 }
 
-func (p *Parser) collect(in chan *lexer.Token) chan *lexer.Token {
+func (p *parser) handleErrors(in chan *lexer.Token) chan *lexer.Token {
 	out := make(chan *lexer.Token)
 
 	go func() {
 		defer close(out)
 		for t := range in {
-			p.Tokens = append(p.Tokens, t)
-			out <- t
-		}
-	}()
-
-	return out
-}
-
-func (p *Parser) groupKeysValues(in chan *lexer.Token) chan []*lexer.Token {
-	out := make(chan []*lexer.Token)
-
-	go func() {
-		defer close(out)
-
-		b := &group{}
-		for t := range in {
-			if t.IsSection() ||
-				t.IsKeyword() ||
-				t.IsSeparator() ||
-				t.IsValue() {
-				if err := b.add(t); err != nil {
-					p.lastError = err
-					return
-				}
-				if b.isFull() {
-					out <- b.tokens
-					b.clear()
-				}
-			}
 			if t.IsError() {
 				p.lastError = fmt.Errorf(msgLexerError, t.Value)
 				return
-			}
-			if t.IsIllegal() {
+			} else if t.IsIllegal() {
 				p.lastError = fmt.Errorf(msgIllegalToken, t.Value)
 				return
-			}
-		}
-
-		if !b.isEmpty() {
-			p.lastError = fmt.Errorf(msgNotEmptyGroup)
-		}
-	}()
-
-	return out
-}
-
-func (p *Parser) buildSections(in chan []*lexer.Token) chan *config.Section {
-	out := make(chan *config.Section)
-
-	go func() {
-		defer close(out)
-
-		var se *config.Section
-
-		for tokens := range in {
-			k := tokens[0] // keyword
-			s := tokens[1] // separator
-			v := tokens[2] // value
-
-			if k.IsSection() {
-				if se != nil {
-					out <- se
-				}
-				t := config.HostType
-				if k.IsMatchSection() {
-					t = config.MatchType
-				}
-				se = config.NewSection(t, s.Value, v.Value)
 			} else {
-				if se == nil {
-					p.lastError = fmt.Errorf(msgNullSection)
-					return
-				}
-				se.Options = append(se.Options, config.NewOption(k.Value, s.Value, v.Value))
+				out <- t
 			}
-		}
-		if se != nil {
-			out <- se
 		}
 	}()
 
 	return out
 }
 
-// Parse --
-func (p *Parser) Parse() error {
-	t := p.collect(p.tokenizer.Run())
-
-	for section := range p.buildSections(p.groupKeysValues(t)) {
-		p.Sections = append(p.Sections, section)
+func (p *parser) parse() error {
+	n := 1
+	l := &config.Line{Number: n}
+	for t := range p.handleErrors(p.tokenizer.Run()) {
+		l.Add(t)
+		if t.IsEOL() || t.IsEOF() {
+			p.Lines = append(p.Lines, l)
+			n++
+			l = &config.Line{Number: n}
+		}
 	}
-
 	return p.lastError
 }
 
@@ -151,12 +78,12 @@ func loadContent(path string) (s string, err error) {
 }
 
 // ParseString parses the input string
-func ParseString(in string) (config.Sections, []*lexer.Token, error) {
-	p := &Parser{tokenizer: lexer.New(in)}
-	if err := p.Parse(); err != nil {
-		return nil, nil, err
+func ParseString(in string) (config.Lines, error) {
+	p := &parser{tokenizer: lexer.New(in)}
+	if err := p.parse(); err != nil {
+		return nil, err
 	}
-	return p.Sections, p.Tokens, nil
+	return p.Lines, nil
 }
 
 // ParseFile parses the file content and returns configuration file structure
@@ -166,12 +93,12 @@ func ParseFile(path string) (*config.File, error) {
 		return nil, err
 	}
 
-	s, t, err := ParseString(string(c))
+	l, err := ParseString(string(c))
 	if err != nil {
 		return nil, err
 	}
 
-	return &config.File{Path: path, Sections: s, Tokens: t}, nil
+	return &config.File{Path: path, Lines: l}, nil
 }
 
 // ParseFiles parses configuration files

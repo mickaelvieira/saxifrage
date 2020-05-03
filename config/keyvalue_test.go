@@ -1,4 +1,4 @@
-package parser
+package config
 
 import (
 	"testing"
@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBufferFirstToken(t *testing.T) {
-	b := &group{}
+func TestKeyValueFirstToken(t *testing.T) {
+	b := &keyValue{}
 
 	err := b.add(&lexer.Token{})
 	assert.Equal(t, err, ErrExpectedKeyword)
@@ -18,8 +18,8 @@ func TestBufferFirstToken(t *testing.T) {
 	assert.Equal(t, 1, len(b.tokens))
 }
 
-func TestBufferFirstTokenWihtSection(t *testing.T) {
-	b := &group{}
+func TestKeyValueFirstTokenWithSection(t *testing.T) {
+	b := &keyValue{}
 
 	err := b.add(&lexer.Token{})
 	assert.Equal(t, err, ErrExpectedKeyword)
@@ -29,8 +29,8 @@ func TestBufferFirstTokenWihtSection(t *testing.T) {
 	assert.Equal(t, 1, len(b.tokens))
 }
 
-func TestBufferSecondToken(t *testing.T) {
-	b := &group{}
+func TestKeyValueSecondToken(t *testing.T) {
+	b := &keyValue{}
 
 	err := b.add(&lexer.Token{Type: lexer.Keyword})
 	assert.Nil(t, err)
@@ -44,8 +44,8 @@ func TestBufferSecondToken(t *testing.T) {
 	assert.Equal(t, 2, len(b.tokens))
 }
 
-func TestBufferThirdToken(t *testing.T) {
-	b := &group{}
+func TestKeyValueThirdToken(t *testing.T) {
+	b := &keyValue{}
 
 	err := b.add(&lexer.Token{Type: lexer.Keyword})
 	assert.Nil(t, err)

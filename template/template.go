@@ -55,7 +55,7 @@ Host {{ .Host }}
  {{ "File" | bold }} {{ .Path | bold | green  }}
 {{ divider | bold }}
 
-{{ . }}
+{{ range .Lines}}{{ .Number | green | bold }}  {{ . }}{{ end }}
 {{ end }}`
 	summaryTemplate = `
  {{ "You are about to create the following SSH key" | bold }}
@@ -64,13 +64,24 @@ Host {{ .Host }}
  {{ "Public:  " | bold }} {{ .PublicKey | bold | green }}
 
 `
+	filesTemplate = `
+Files to be deleted:
+
+{{ range .KeyFiles}}{{ . }}
+{{ end }}
+`
+	linesTemplate = `
+Lines to be deleted:
+
+{{ range .Lines}}{{ .Number | green | bold }} {{ . | bold }}{{ end }}
+`
 	listTemplate = `{{ range .Files }}
 {{ divider | bold }}
  {{ "File" | bold }} {{ .Path | bold | green  }}
-{{ divider | bold }}{{ $l := len .Sections }}
+{{ divider | bold }}{{ $l := len .BuildSections }}
 {{ if eq $l 0 }}
  No sections have been defined in this file
-{{ else }}{{ range .Sections }}
+{{ else }}{{ range .BuildSections }}
  {{ .Type | bold }}{{ .Separator }}{{ .Matching | green | bold }}
 {{ range .Options }}
      {{ .Name | bold }}{{ .Separator }}{{ .Value | green | bold }}{{ end }}
@@ -90,6 +101,8 @@ var templates = map[string]string{
 	"ask-confirm": askConfirmTemplate,
 	"message":     messageTempate,
 	"config":      configTemplate,
+	"files":       filesTemplate,
+	"lines":       linesTemplate,
 }
 
 func getTemplate(n string) (*template.Template, error) {

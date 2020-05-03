@@ -1,4 +1,4 @@
-package parser
+package config
 
 import (
 	"errors"
@@ -13,11 +13,11 @@ var (
 	ErrExpectedValue     = errors.New("A value was expected")
 )
 
-type group struct {
+type keyValue struct {
 	tokens []*lexer.Token
 }
 
-func (b *group) add(t *lexer.Token) (err error) {
+func (b *keyValue) add(t *lexer.Token) (err error) {
 	switch len(b.tokens) {
 	case 0:
 		if !t.IsKeyword() && !t.IsSection() {
@@ -39,14 +39,10 @@ func (b *group) add(t *lexer.Token) (err error) {
 	return err
 }
 
-func (b *group) isEmpty() bool {
+func (b *keyValue) isEmpty() bool {
 	return len(b.tokens) == 0
 }
 
-func (b *group) isFull() bool {
+func (b *keyValue) isComplete() bool {
 	return len(b.tokens) == 3
-}
-
-func (b *group) clear() {
-	b.tokens = make([]*lexer.Token, 0)
 }

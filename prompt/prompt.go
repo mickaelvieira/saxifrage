@@ -20,6 +20,9 @@ const (
 	MsgPromptKeyHost       = "Enter the host to which you want to associate this key"
 	MsgPromptKeyPort       = "Enter the port"
 	MsgPromptKeyUser       = "Enter the user"
+	MsgGeneratingKeys      = "Generating SSH keys..."
+	MsgKeyGenerated        = "The SSH keys were generated successfully!"
+	MsgConfigGenerated     = "The SSH key was added to your config file"
 )
 
 // Msg output a message in the console

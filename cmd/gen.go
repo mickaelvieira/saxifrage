@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"os"
-	"strings"
 
 	"github.com/mickaelvieira/saxifrage/config"
 	"github.com/mickaelvieira/saxifrage/keys"
@@ -10,10 +9,6 @@ import (
 	"github.com/mickaelvieira/saxifrage/prompt"
 	"github.com/mickaelvieira/saxifrage/template"
 )
-
-func makeHomePathRelative(p string) string {
-	return strings.Replace(p, os.Getenv("HOME"), "~", 1)
-}
 
 func runGen(a *App) error {
 	keyOpts, err := prompt.KeyFlow()
@@ -42,7 +37,7 @@ func runGen(a *App) error {
 			}
 		}
 
-		if err := prompt.Msg("Generating SSH keys..."); err != nil {
+		if err := prompt.Msg(prompt.MsgGeneratingKeys); err != nil {
 			return err
 		}
 
@@ -59,17 +54,17 @@ func runGen(a *App) error {
 		if e := keys.Writekeys(publicKey, privateKey, keyOpts); e != nil {
 			return e
 		}
-		if e := prompt.Msg("The SSH keys were generated successfully!"); e != nil {
+		if e := prompt.Msg(prompt.MsgKeyGenerated); e != nil {
 			return e
 		}
 
-		confirm, err = prompt.Confirm(prompt.MsgConfirmAddition)
+		confirm, err := prompt.Confirm(prompt.MsgConfirmAddition)
 		if err != nil {
 			return err
 		}
 
 		if confirm {
-			genOpts, err := prompt.ConfigFlow(makeHomePathRelative(keyOpts.PrivateKey))
+			configOpts, err := prompt.ConfigFlow(config.ToRelativePath(keyOpts.PrivateKey))
 			if err != nil {
 				return err
 			}
@@ -84,22 +79,22 @@ func runGen(a *App) error {
 				return config.ErrMissingUserConfig
 			}
 
-			s, err := template.AsString("config", genOpts)
+			s, err := template.AsString("config", configOpts)
 			if err != nil {
 				return err
 			}
 
-			_, tokens, err := parser.ParseString(s)
+			lines, err := parser.ParseString(s)
 			if err != nil {
 				return err
 			}
 
-			f.Tokens = append(f.Tokens, tokens...)
+			f.Lines = append(f.Lines, lines...)
 
 			if err := config.WriteToFile(f.Bytes()); err != nil {
 				return err
 			}
-			if err := prompt.Msg("The SSH key was added to your config file"); err != nil {
+			if err := prompt.Msg(prompt.MsgConfigGenerated); err != nil {
 				return nil
 			}
 		}
