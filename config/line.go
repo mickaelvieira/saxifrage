@@ -78,32 +78,23 @@ func (l *Line) IsSection() bool {
 	if len(l.tokens) == 0 {
 		return false
 	}
-
 	for _, t := range l.tokens {
 		if t.IsSection() {
 			return true
 		}
 	}
-
 	return false
 }
 
-// IsSectionMatching @TODO to refactor
-func (l *Line) IsSectionMatching(s string) bool {
+// HasValue checks whether a token in the line has the provided value
+func (l *Line) HasValue(s string) bool {
 	if len(l.tokens) == 0 {
 		return false
 	}
-
-	var found bool
-
 	for _, t := range l.tokens {
-		if t.IsSection() {
-			found = true
-		}
-		if found && t.IsValue() && t.Value == s {
+		if t.IsValue() && t.Value == s {
 			return true
 		}
 	}
-
 	return false
 }

@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // WriteToFile writes the key to a file
@@ -26,10 +27,7 @@ func GetKeyFiles(s *Section) ([]string, error) {
 		return files, nil
 	}
 
-	// @TODO there is a bug here
-	// The value might be between quotes
-
-	privateKey := ToAbsolutePath(option.Value)
+	privateKey := ToAbsolutePath(strings.Trim(option.Value, "\""))
 	publickey := privateKey + ".pub"
 	directory := filepath.Dir(privateKey)
 

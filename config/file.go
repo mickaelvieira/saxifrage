@@ -2,13 +2,22 @@ package config
 
 import (
 	"errors"
-	"fmt"
 )
 
 // Files errors
 var (
 	ErrMissingUserConfig = errors.New("Unable to find user configuration file")
+	ErrMissingSection    = errors.New("A Host or Match keyword was expected")
 )
+
+func contains(n []int, e int) bool {
+	for _, a := range n {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
 
 // Files list of ssh_config files
 type Files []*File
@@ -32,54 +41,33 @@ type File struct {
 // RemoveLineNumbers removes the lines from file with the provided numbers
 func (f *File) RemoveLineNumbers(n []int) {
 	var lines Lines
-
-	contains := func(e int) bool {
-		for _, a := range n {
-			if a == e {
-				return true
-			}
-		}
-		return false
-	}
-
 	for _, l := range f.Lines {
-		if !contains(l.Number) {
+		if !contains(n, l.Number) {
 			lines = append(lines, l)
 		}
 	}
-
 	f.Lines = lines
 }
 
 // CommentLineNumbers comments the lines from file with the provided numbers
 func (f *File) CommentLineNumbers(n []int) {
-	contains := func(e int) bool {
-		for _, a := range n {
-			if a == e {
-				return true
-			}
-		}
-		return false
-	}
-
 	for _, l := range f.Lines {
-		if contains(l.Number) {
+		if contains(n, l.Number) {
 			l.Comment()
 		}
 	}
 }
 
-// FindSectionLines ...
-func (f *File) FindSectionLines(s string) Lines {
-	var lines Lines
-
+// FindSectionLines finds the section line and its related configuration
+func (f *File) FindSectionLines(s string) (lines Lines) {
 	var found bool
+
 	for _, l := range f.Lines {
-		if l.IsSectionMatching(s) {
+		if l.IsSection() && l.HasValue(s) {
 			found = true
 		}
 		if found {
-			if l.IsSection() && !l.IsSectionMatching(s) {
+			if l.IsSection() && !l.HasValue(s) {
 				found = false
 			} else if !l.IsComment() && !l.IsEmpty() {
 				lines = append(lines, l)
@@ -90,56 +78,67 @@ func (f *File) FindSectionLines(s string) Lines {
 	return lines
 }
 
-// BuildSections builds the sections from the file's lines
-func (f *File) BuildSections() (Sections, error) {
+func (f *File) buildKeywords() ([]*keyword, error) {
+	var keywords []*keyword
 
-	var sections Sections
-
-	var a []*keyValue
-
-	kv := &keyValue{}
+	kw := &keyword{}
 	for _, l := range f.Lines {
 		for _, t := range l.tokens {
 			if t.IsSection() ||
 				t.IsKeyword() ||
 				t.IsSeparator() ||
 				t.IsValue() {
-				if err := kv.add(t); err != nil {
-					return sections, err
+				if err := kw.add(t); err != nil {
+					return keywords, err
 				}
-				if kv.isComplete() {
-					a = append(a, kv)
-					kv = &keyValue{}
+				if kw.isComplete() {
+					keywords = append(keywords, kw)
+					kw = &keyword{}
 				}
 			}
 		}
 	}
+	return keywords, nil
+}
 
-	var se *Section
-	for _, kv := range a {
-		k := kv.tokens[0] // keyword
-		s := kv.tokens[1] // separator
-		v := kv.tokens[2] // value
+// BuildSections builds the sections from the file's lines
+func (f *File) BuildSections() (Sections, error) {
+	var sections Sections
+	var section *Section
 
-		if k.IsSection() {
-			if se != nil {
-				sections = append(sections, se)
-			}
+	keywords, err := f.buildKeywords()
+	if err != nil {
+		return sections, err
+	}
+
+	for _, kw := range keywords {
+		name := kw.name()
+		separator := kw.separator()
+		value := kw.value()
+
+		if name.IsSection() {
 			t := HostType
-			if k.IsMatchSection() {
+			if name.IsMatchSection() {
 				t = MatchType
 			}
-			se = NewSection(t, s.Value, v.Value)
-		} else {
-			if se == nil {
-				return sections, fmt.Errorf("Section is null")
+			if section != nil {
+				sections = append(sections, section)
 			}
-			se.Options = append(se.Options, NewOption(k.Value, s.Value, v.Value))
+			section = NewSection(t, separator.Value, value.Value)
+		} else {
+			if section == nil {
+				return sections, ErrMissingSection
+			}
+			section.Options = append(section.Options, NewOption(
+				name.Value,
+				separator.Value,
+				value.Value,
+			))
 		}
 	}
 
-	if se != nil {
-		sections = append(sections, se)
+	if section != nil {
+		sections = append(sections, section)
 	}
 
 	return sections, nil

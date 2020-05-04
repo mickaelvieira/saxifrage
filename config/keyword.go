@@ -13,12 +13,25 @@ var (
 	ErrExpectedValue     = errors.New("A value was expected")
 )
 
-type keyValue struct {
+// keyword is composed of a 3 tokens, a name, a separator, and a value
+type keyword struct {
 	tokens []*lexer.Token
 }
 
-func (b *keyValue) add(t *lexer.Token) (err error) {
-	switch len(b.tokens) {
+func (k *keyword) name() *lexer.Token {
+	return k.tokens[0]
+}
+
+func (k *keyword) separator() *lexer.Token {
+	return k.tokens[1]
+}
+
+func (k *keyword) value() *lexer.Token {
+	return k.tokens[2]
+}
+
+func (k *keyword) add(t *lexer.Token) (err error) {
+	switch len(k.tokens) {
 	case 0:
 		if !t.IsKeyword() && !t.IsSection() {
 			err = ErrExpectedKeyword
@@ -34,15 +47,15 @@ func (b *keyValue) add(t *lexer.Token) (err error) {
 	}
 
 	if err == nil {
-		b.tokens = append(b.tokens, t)
+		k.tokens = append(k.tokens, t)
 	}
 	return err
 }
 
-func (b *keyValue) isEmpty() bool {
-	return len(b.tokens) == 0
+func (k *keyword) isEmpty() bool {
+	return len(k.tokens) == 0
 }
 
-func (b *keyValue) isComplete() bool {
-	return len(b.tokens) == 3
+func (k *keyword) isComplete() bool {
+	return len(k.tokens) == 3
 }
