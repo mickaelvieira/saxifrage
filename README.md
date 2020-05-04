@@ -31,5 +31,6 @@ $ sax
   dump      Dump your SSH configuration
   gen       Generate interactively a SSH key (rsa, dsa, ecdsa, ed25519)
   help      Show this help
+  rm        Remove interactively a section and its related SSH keys
 ```
 

@@ -1,5 +1,9 @@
 package config
 
+import (
+	"strings"
+)
+
 // SectionType is the type of the section
 type SectionType string
 
@@ -12,9 +16,59 @@ const (
 // Sections contains the section found in ssh_config files
 type Sections []*Section
 
+// GetMatchingValues ...
+func (s Sections) GetMatchingValues() []string {
+	values := make([]string, len(s))
+	for k, v := range s {
+		values[k] = v.Matching
+	}
+	return values
+}
+
+// FindAt returns section at the given index
+func (s Sections) FindAt(i int) *Section {
+	if i >= 0 && i < len(s) {
+		return s[i]
+	}
+	return nil
+}
+
+// FindSectionByMatchingValue ...
+func (s Sections) FindSectionByMatchingValue(value string) *Section {
+	return s.Find(func(s *Section) bool {
+		return s.Matching == value
+	})
+}
+
+// Find returns the first section matching the predicate
+func (s Sections) Find(predicate func(s *Section) bool) *Section {
+	for _, section := range s {
+		if predicate(section) {
+			return section
+		}
+	}
+	return nil
+}
+
+// FindIndex returns the index of the first section matching the predicate
+func (s Sections) FindIndex(predicate func(s *Section) bool) int {
+	for i, section := range s {
+		if predicate(section) {
+			return i
+		}
+	}
+	return -1
+}
+
 // Filter the sections
-func (s Sections) Filter() []*Section {
-	panic("not implemented")
+func (s Sections) Filter(predicate func(s *Section) bool) Sections {
+	sections := make(Sections, 0)
+	for _, section := range s {
+		if predicate(section) {
+			sections = append(sections, section)
+		}
+	}
+	return sections
 }
 
 // Section represents a section in a configuration file
@@ -23,7 +77,20 @@ type Section struct {
 	Type      SectionType
 	Matching  string
 	Separator string
-	Options   []*Option
+	Options   Options
+}
+
+// Options is a list of options
+type Options []*Option
+
+// Find returns the first section matching the predicate
+func (o Options) Find(n string) *Option {
+	for _, option := range o {
+		if strings.ToLower(n) == strings.ToLower(option.Name) {
+			return option
+		}
+	}
+	return nil
 }
 
 // Option represents a section's option

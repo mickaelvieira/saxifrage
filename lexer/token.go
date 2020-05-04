@@ -17,6 +17,9 @@ const (
 	Comment                     // a comment
 )
 
+// Tokens all the file's tokens
+type Tokens []*Token
+
 // Token is a token returned by the lexer.
 // It has a type and a value representing
 // the sequence of characters found in the input string
@@ -95,7 +98,7 @@ func (t *Token) String() string {
 	}
 }
 
-// ToBytes returns the tokens as bytes
-func (t *Token) ToBytes() []byte {
+// Bytes returns the tokens as bytes
+func (t *Token) Bytes() []byte {
 	return []byte(t.Value)
 }
