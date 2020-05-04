@@ -1,7 +1,5 @@
 package lexer
 
-import "fmt"
-
 // TokenType lexer token type
 type TokenType int
 
@@ -21,30 +19,6 @@ const (
 
 // Tokens all the file's tokens
 type Tokens []*Token
-
-// RemoveSection removes the section and its related keywords
-func (t *Tokens) RemoveSection(m string) {
-	tokens := make(Tokens, 0)
-	excluded := false
-
-	for _, token := range *t {
-		if token.IsSection() {
-			if token.Value == m {
-				excluded = true
-			} else {
-				excluded = false
-			}
-		}
-
-		fmt.Printf("Exclude %s %t \n", token.Value, excluded)
-
-		if !excluded {
-			tokens = append(tokens, token)
-		}
-	}
-
-	*t = tokens
-}
 
 // Token is a token returned by the lexer.
 // It has a type and a value representing
