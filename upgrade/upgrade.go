@@ -109,6 +109,9 @@ func ReplaceBinary() error {
 	source := filepath.Clean(fmt.Sprintf("./%s", binFile))
 	destination := filepath.Clean(fmt.Sprintf("%s/%s", dir, binFile))
 
+	// Since it is not possible to rename a file across different partitions
+	// this line will fail if the binary is not on the same partition than the "tmp" directory/
+	// A solution to this issue could be to copy the file to the partition first and then rename it.
 	if e := os.Rename(source, destination); e != nil {
 		return e
 	}
