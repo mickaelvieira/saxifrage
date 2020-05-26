@@ -10,12 +10,26 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/hashicorp/go-version"
 	"github.com/mickaelvieira/saxifrage/prompt"
 )
 
 const binFile = "sax"
 const archiveURL = "https://github.com/mickaelvieira/saxifrage/releases/download/v%s/%s"
 const versionFile = "https://raw.githubusercontent.com/mickaelvieira/saxifrage/master/.github/.version"
+
+// CompareVersions compares the current and the latest versions
+func CompareVersions(c, l string) (bool, error) {
+	current, err := version.NewVersion(c)
+	if err != nil {
+		return false, err
+	}
+	latest, err := version.NewVersion(l)
+	if err != nil {
+		return false, err
+	}
+	return current.LessThan(latest), nil
+}
 
 // Download download the zip file from github and write it into a file
 func Download(filename, version string) error {
@@ -42,8 +56,8 @@ func Download(filename, version string) error {
 	return err
 }
 
-// Unzip unzips the file
-func Unzip(file string) ([]byte, error) {
+// Unpack unzips the file
+func Unpack(file string) ([]byte, error) {
 	cmd := exec.Command("unzip", file) // #nosec
 	return cmd.Output()
 }
@@ -92,21 +106,13 @@ func ReplaceBinary() error {
 	}
 	dir = filepath.Dir(dir)
 
-	source := fmt.Sprintf("./%s", binFile)
-	destination := fmt.Sprintf("%s/%s", dir, binFile)
+	source := filepath.Clean(fmt.Sprintf("./%s", binFile))
+	destination := filepath.Clean(fmt.Sprintf("%s/%s", dir, binFile))
 
-	s, err := os.Open(filepath.Clean(source))
-	if err != nil {
-		return err
-	}
-	defer s.Close() // #nosec
-
-	c, err := ioutil.ReadAll(s)
-	if err != nil {
-		return err
-	}
-	// #nosec
-	if e := ioutil.WriteFile(filepath.Clean(destination), c, 0700); e != nil {
+	// Since it is not possible to rename a file across different partitions
+	// this line will fail if the binary is not on the same partition than the "tmp" directory/
+	// A solution to this issue could be to copy the file to the partition first and then rename it.
+	if e := os.Rename(source, destination); e != nil {
 		return e
 	}
 
