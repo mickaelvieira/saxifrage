@@ -44,8 +44,9 @@ func runRemove(a *App) error {
 	}
 
 	lines := file.FindSectionLines(section.Matching)
-	keys, err := config.GetKeyFiles(section)
-	if err != nil {
+	keyPath := section.GetIdentityFile()
+	keyFiles, err := config.GetKeyFiles(keyPath)
+	if err != nil && err != config.ErrMissingIdentityFileValue {
 		return err
 	}
 
@@ -53,11 +54,11 @@ func runRemove(a *App) error {
 		KeyFiles []string
 		Lines    config.Lines
 	}{
-		KeyFiles: keys,
+		KeyFiles: keyFiles,
 		Lines:    lines,
 	}
 
-	if len(keys) > 0 {
+	if len(keyFiles) > 0 {
 		if err := template.Output("files", d); err != nil {
 			return err
 		}
@@ -68,8 +69,14 @@ func runRemove(a *App) error {
 		}
 
 		if confirm {
-			for _, keyFile := range keys {
+			for _, keyFile := range keyFiles {
 				if err := os.Remove(keyFile); err != nil {
+					return err
+				}
+			}
+			keyDir, err := config.GetKeyDir(keyPath)
+			if err == nil {
+				if err := os.Remove(keyDir); err != nil {
 					return err
 				}
 			}
@@ -81,19 +88,18 @@ func runRemove(a *App) error {
 			return err
 		}
 
-		r, err := prompt.Prompt(prompt.MsgConfirmDeleteLines, "ignore")
+		r, err := prompt.Prompt(prompt.MsgConfirmDeleteLines, "d")
 		if err != nil {
 			return err
 		}
 
-		if r == "d" {
-			file.RemoveLineNumbers(lines.GetNumbers())
+		if r == "c" {
+			file.CommentLineNumbers(lines.GetNumbers())
 			if err := config.WriteToFile(file.Bytes()); err != nil {
 				return err
 			}
-		}
-		if r == "c" {
-			file.CommentLineNumbers(lines.GetNumbers())
+		} else {
+			file.RemoveLineNumbers(lines.GetNumbers())
 			if err := config.WriteToFile(file.Bytes()); err != nil {
 				return err
 			}
