@@ -75,12 +75,14 @@ func New(v string) *App {
 		Usage:   "A CLI tool to manage your SSH keys",
 	}
 
-	a.Commands = make(commands, 5)
+	a.Commands = make(commands, 7)
 	a.Commands[0] = &command{Name: "gen", Usage: fmt.Sprintf("Generate interactively a SSH key (%s)", keys.TypesToString()), Action: runGenerate}
 	a.Commands[1] = &command{Name: "ls", Usage: "List SSH configuration sections", Action: runList}
 	a.Commands[2] = &command{Name: "dump", Usage: "Dump your SSH configuration", Action: runDump}
 	a.Commands[3] = &command{Name: "rm", Usage: "Remove interactively a section and its related SSH keys", Action: runRemove}
 	a.Commands[4] = &command{Name: "help", Usage: "Show this help", Action: runHelp}
+	a.Commands[5] = &command{Name: "upgrade", Usage: "Upgrade saxifrage", Action: runUpgrade}
+	a.Commands[6] = &command{Name: "version", Usage: "Display the application version", Action: runVersion}
 
 	return a
 }
