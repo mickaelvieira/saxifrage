@@ -27,9 +27,11 @@ $ sax
 
  COMMANDS:
 
-  dump    Dump your SSH configuration
-  gen     Generate interactively a SSH key (rsa, dsa, ecdsa, ed25519)
-  help    Show this help
-  ls      List SSH configuration sections
-  rm      Remove interactively a section and its related SSH keys
+  dump       Dump your SSH configuration
+  gen        Generate interactively a SSH key (rsa, dsa, ecdsa, ed25519)
+  help       Show this help
+  ls         List SSH configuration sections
+  rm         Remove interactively a section and its related SSH keys
+  upgrade    Upgrade saxifrage
+  version    Display the application version
 ```
