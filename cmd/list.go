@@ -6,7 +6,7 @@ import (
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
-func runConfig(a *App) error {
+func runList(a *App) error {
 	files, err := parser.ParseFiles()
 	if err != nil {
 		return err
