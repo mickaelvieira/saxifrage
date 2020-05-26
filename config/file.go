@@ -6,8 +6,9 @@ import (
 
 // Files errors
 var (
-	ErrMissingUserConfig = errors.New("Unable to find user configuration file")
-	ErrMissingSection    = errors.New("A Host or Match keyword was expected")
+	ErrMissingUserConfig        = errors.New("Unable to find user configuration file")
+	ErrMissingSection           = errors.New("A Host or Match keyword was expected")
+	ErrMissingIdentityFileValue = errors.New("Section does not have IdentityFile value")
 )
 
 func contains(n []int, e int) bool {

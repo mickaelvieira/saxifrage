@@ -80,11 +80,20 @@ type Section struct {
 	Options   Options
 }
 
+// GetIdentityFile returns the path the private key
+func (s *Section) GetIdentityFile() (p string) {
+	o := s.Options.FindByName("IdentityFile")
+	if o != nil {
+		p = o.GetUnquotedValue()
+	}
+	return p
+}
+
 // Options is a list of options
 type Options []*Option
 
-// Find returns the first section matching the predicate
-func (o Options) Find(n string) *Option {
+// FindByName returns the first section matching the predicate
+func (o Options) FindByName(n string) *Option {
 	for _, option := range o {
 		if strings.ToLower(n) == strings.ToLower(option.Name) {
 			return option
@@ -98,6 +107,11 @@ type Option struct {
 	Name      string
 	Value     string
 	Separator string
+}
+
+// GetUnquotedValue returns the value without leading and trailing quotes
+func (o *Option) GetUnquotedValue() string {
+	return strings.Trim(o.Value, "\"")
 }
 
 // NewSection creates a new section

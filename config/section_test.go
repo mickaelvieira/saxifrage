@@ -109,7 +109,7 @@ func TestFilterSections(t *testing.T) {
 	assert.Equal(t, 0, len(got))
 }
 
-func TestFindOptions(t *testing.T) {
+func TestFindOptionByName(t *testing.T) {
 	o1 := &Option{Name: "host"}
 	o2 := &Option{Name: "IdentityFile"}
 
@@ -117,12 +117,12 @@ func TestFindOptions(t *testing.T) {
 	o[0] = o1
 	o[1] = o2
 
-	got := o.Find("Host")
+	got := o.FindByName("Host")
 	assert.Equal(t, o1, got)
 
-	got = o.Find("identityfile")
+	got = o.FindByName("identityfile")
 	assert.Equal(t, o2, got)
 
-	got = o.Find("foo")
+	got = o.FindByName("foo")
 	assert.Nil(t, got)
 }

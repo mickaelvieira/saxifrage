@@ -10,7 +10,7 @@ import (
 	"github.com/mickaelvieira/saxifrage/template"
 )
 
-func runGen(a *App) error {
+func runGenerate(a *App) error {
 	keyOpts, err := prompt.KeyFlow()
 	if err != nil {
 		return err
