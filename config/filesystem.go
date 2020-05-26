@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -21,16 +20,21 @@ func WriteToFile(b []byte) error {
 
 // IsDirEmpty is the directory empty?
 func IsDirEmpty(path string) (bool, error) {
-	f, err := os.Open(path)
+	f, err := os.Open(filepath.Clean(path))
 	if err != nil {
 		return false, err
 	}
-	defer f.Close()
 
 	_, err = f.Readdirnames(1)
 	if err == io.EOF {
 		return true, nil
 	}
+
+	err = f.Close()
+	if err != nil {
+		return false, err
+	}
+
 	return false, err
 }
 
@@ -44,27 +48,12 @@ func GetKeyFiles(s string) ([]string, error) {
 
 	privateKey := ToAbsolutePath(s)
 	publickey := privateKey + ".pub"
-	directory := filepath.Dir(privateKey)
 
 	if _, err := os.Stat(privateKey); err == nil {
 		files = append(files, privateKey)
 	}
 	if _, err := os.Stat(privateKey); err == nil {
 		files = append(files, publickey)
-	}
-
-	if !IsBaseSSHDirectory(directory) {
-		keyFiles, err := ioutil.ReadDir(directory)
-		if err != nil {
-			if os.IsNotExist(err) {
-				return files, nil
-			}
-			return files, err
-		}
-		n := len(keyFiles) / 2
-		if n < 2 {
-			files = append(files, directory)
-		}
 	}
 
 	return files, nil
@@ -79,13 +68,13 @@ func GetKeyDir(s string) (dp string, err error) {
 	fp := ToAbsolutePath(strings.Trim(s, "\""))
 	dp = filepath.Dir(fp)
 
-	if !IsBaseSSHDirectory(dp) {
-		return dp, errors.New("is base dir")
+	if IsBaseSSHDirectory(dp) {
+		return dp, ErrIsSSHBasedDirection
 	}
 
 	empty, err := IsDirEmpty(dp)
 	if err != nil || !empty {
-		return dp, errors.New("Dir is not empty")
+		return dp, ErrDirectoryIsNotEmpty
 	}
 
 	return dp, nil
