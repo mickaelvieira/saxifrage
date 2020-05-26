@@ -18,7 +18,8 @@ func runUpgrade(a *App) error {
 	if e := prompt.Msg("Checking for latest version"); e != nil {
 		return e
 	}
-	version, err := upgrade.GetLatestVersion()
+
+	latest, err := upgrade.GetLatestVersion()
 	if err != nil {
 		return err
 	}
@@ -26,31 +27,43 @@ func runUpgrade(a *App) error {
 	if e := prompt.Msg("Version has been found"); e != nil {
 		return e
 	}
-	if e := prompt.Msg(fmt.Sprintf("%s is upgrading to version %s", a.Name, version)); e != nil {
-		return e
-	}
 
-	tempDir, err := ioutil.TempDir(os.TempDir(), "saxifrage-*")
-	if err != nil {
-		return err
-	}
-	if e := os.Chdir(tempDir); e != nil {
-		return e
-	}
-	defer os.RemoveAll(tempDir)
-
-	if e := upgrade.Download(filename, version); e != nil {
-		return e
-	}
-
-	out, err := upgrade.Unzip(filename)
-	fmt.Printf("%s", out)
+	shouldUpdate, err := upgrade.CompareVersions(a.Version, latest)
 	if err != nil {
 		return err
 	}
 
-	if e := upgrade.ReplaceBinary(); e != nil {
-		return e
+	if !shouldUpdate {
+		if e := prompt.Msg(fmt.Sprintf("%s is upgrading to version %s", a.Name, latest)); e != nil {
+			return e
+		}
+
+		tempDir, err := ioutil.TempDir(os.TempDir(), "saxifrage-*")
+		if err != nil {
+			return err
+		}
+		if e := os.Chdir(tempDir); e != nil {
+			return e
+		}
+		defer os.RemoveAll(tempDir)
+
+		if e := upgrade.Download(filename, latest); e != nil {
+			return e
+		}
+
+		out, err := upgrade.Unpack(filename)
+		fmt.Printf("%s", out)
+		if err != nil {
+			return err
+		}
+
+		if e := upgrade.ReplaceBinary(); e != nil {
+			return e
+		}
+	} else {
+		if e := prompt.Msg(fmt.Sprintf("%s is already up-to-date", a.Name)); e != nil {
+			return e
+		}
 	}
 
 	return nil
