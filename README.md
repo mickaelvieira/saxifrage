@@ -14,6 +14,12 @@ $ sudo mv sax /usr/local/bin/
 $ sudo chmod u+x /usr/local/bin/sax
 ```
 
+## Upgrade
+
+```sh
+$ sax upgrade
+```
+
 ## Usage
 
 ```sh

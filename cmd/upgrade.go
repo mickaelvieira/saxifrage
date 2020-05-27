@@ -33,7 +33,7 @@ func runUpgrade(a *App) error {
 		return err
 	}
 
-	if !shouldUpdate {
+	if shouldUpdate {
 		if e := prompt.Msg(fmt.Sprintf("%s is upgrading to version %s", a.Name, latest)); e != nil {
 			return e
 		}
