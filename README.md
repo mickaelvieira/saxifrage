@@ -37,7 +37,7 @@ $ sax
   Saxifrage 0.4.0 - A CLI tool to manage your SSH keys
 
  USAGE:
-  saxifrage [command]
+  sax [command]
 
  COMMANDS:
 
