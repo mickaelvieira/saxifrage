@@ -22,15 +22,17 @@ func getCommandList(a commands) map[string]string {
 
 func runHelp(a *App) error {
 	d := struct {
-		AppName    string
-		AppUsage   string
-		AppVersion string
-		Commands   map[string]string
+		AppName       string
+		AppUsage      string
+		AppVersion    string
+		AppExecutable string
+		Commands      map[string]string
 	}{
-		AppName:    a.Name,
-		AppUsage:   a.Usage,
-		AppVersion: a.Version,
-		Commands:   getCommandList(a.Commands),
+		AppName:       a.Name,
+		AppUsage:      a.Usage,
+		AppVersion:    a.Version,
+		AppExecutable: a.Executable,
+		Commands:      getCommandList(a.Commands),
 	}
 
 	if err := template.Output("help", d); err != nil {

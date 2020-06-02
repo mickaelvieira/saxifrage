@@ -44,7 +44,7 @@ Host {{ .Host }}
   {{ .AppName }} {{ .AppVersion }} - {{ .AppUsage }}
 
  USAGE:
-  {{ .AppName }} [command]
+  {{ .AppExecutable }} [command]
 
  COMMANDS:
 {{ range $name, $usage := .Commands}}
@@ -90,6 +90,15 @@ Lines to be deleted:
 	askConfirmTemplate = `{{ "? " | bold | blue }}{{ printf "%s %s" .Text "(y/N)?" | bold }} `
 	messageTempate     = `{{ "=> " | bold | green }}{{ .Text | bold }}
 `
+	completionTemplate = `#!/bin/bash
+
+_saxifrage()
+{
+  IFS=" " read -r -a COMPREPLY <<<"$(compgen -W "{{ .Commands}}" "${COMP_WORDS[1]}")"
+}
+
+complete -F _saxifrage {{ .AppExecutable }}
+	`
 )
 
 var templates = map[string]string{
@@ -103,6 +112,7 @@ var templates = map[string]string{
 	"config":      configTemplate,
 	"files":       filesTemplate,
 	"lines":       linesTemplate,
+	"completion":  completionTemplate,
 }
 
 func getTemplate(n string) (*template.Template, error) {
