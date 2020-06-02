@@ -3,11 +3,14 @@ package template
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 	"text/template"
 
 	"github.com/manifoldco/promptui"
+	"github.com/markbates/pkger"
 )
 
 // GetMaxLen returns the length of the longest string
@@ -32,129 +35,68 @@ func Line(l int) string {
 	return strings.Repeat("-", l)
 }
 
-var (
-	configTemplate = `
-Host {{ .Host }}
-{{ if .User }}    User {{ .User }}{{ end }}
-    Port {{ .Port }}
-    IdentityFile {{ .IdentityFile }}
-`
-	helpTemplate = `
- NAME:
-  {{ .AppName }} {{ .AppVersion }} - {{ .AppUsage }}
-
- USAGE:
-  {{ .AppExecutable }} [command]
-
- COMMANDS:
-{{ range $name, $usage := .Commands}}
-  {{ $name }}    {{ $usage }}{{ end }}
-`
-	dumpTemplate = `{{ range .Files }}
-{{ divider | bold }}
- {{ "File" | bold }} {{ .Path | bold | green  }}
-{{ divider | bold }}
-
-{{ range .Lines}}{{ .Number | green | bold }}  {{ . }}{{ end }}
-{{ end }}`
-	summaryTemplate = `
- {{ "You are about to create the following SSH key" | bold }}
- {{ "Type:    " | bold }} {{ .KeyType | bold | green }}
- {{ "Private: " | bold }} {{ .PrivateKey | bold | green }}
- {{ "Public:  " | bold }} {{ .PublicKey | bold | green }}
-
-`
-	filesTemplate = `
-Files to be deleted:
-
-{{ range .KeyFiles}}{{ . }}
-{{ end }}
-`
-	linesTemplate = `
-Lines to be deleted:
-
-{{ range .Lines}}{{ .Number | green | bold }} {{ . | bold }}{{ end }}
-`
-	listTemplate = `{{ range .Files }}
-{{ divider | bold }}
- {{ "File" | bold }} {{ .Path | bold | green  }}
-{{ divider | bold }}{{ $l := len .BuildSections }}
-{{ if eq $l 0 }}
- No sections have been defined in this file
-{{ else }}{{ range .BuildSections }}
- {{ .Type | bold }}{{ .Separator }}{{ .Matching | green | bold }}
-{{ range .Options }}
-     {{ .Name | bold }}{{ .Separator }}{{ .Value | green | bold }}{{ end }}
-{{ end }}{{ end }}{{ end }}`
-	readInputTemplate  = `{{ "✔ " | green }}{{ .Text | bold }}{{ if .Default }} {{ printf "%s%s%s" "(" .Default ")" | faint }}{{ end }}{{ ": " | bold }}`
-	askConfirmTemplate = `{{ "? " | bold | blue }}{{ printf "%s %s" .Text "(y/N)?" | bold }} `
-	messageTempate     = `{{ "=> " | bold | green }}{{ .Text | bold }}
-`
-	completionTemplate = `#!/bin/bash
-
-_saxifrage()
-{
-  IFS=" " read -r -a COMPREPLY <<<"$(compgen -W "{{ .Commands}}" "${COMP_WORDS[1]}")"
-}
-
-complete -F _saxifrage {{ .AppExecutable }}
-	`
-)
-
-var templates = map[string]string{
-	"dump":        dumpTemplate,
-	"help":        helpTemplate,
-	"summary":     summaryTemplate,
-	"list":        listTemplate,
-	"read-input":  readInputTemplate,
-	"ask-confirm": askConfirmTemplate,
-	"message":     messageTempate,
-	"config":      configTemplate,
-	"files":       filesTemplate,
-	"lines":       linesTemplate,
-	"completion":  completionTemplate,
-}
-
-func getTemplate(n string) (*template.Template, error) {
-	s, ok := templates[n]
-	if !ok {
-		return nil, fmt.Errorf("Template '%s' does not exist", n)
-	}
-
+func compile(dir string) (*template.Template, error) {
 	fn := promptui.FuncMap
 	fn["divider"] = Divider
 	fn["line"] = Line
 
-	t, err := template.New(n).Funcs(fn).Parse(s)
+	t := template.New("app-templates").Funcs(fn)
+
+	err := pkger.Walk(dir, func(path string, info os.FileInfo, _ error) error {
+		if info.IsDir() || !strings.HasSuffix(path, ".tmpl") {
+			return nil
+		}
+
+		f, err := pkger.Open(path)
+		if err != nil {
+			return err
+		}
+
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			return err
+		}
+
+		_, err = t.Parse(string(b))
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return t, err
+}
+
+// Templates a template rendering
+type Templates struct {
+	templates *template.Template
+}
+
+// New creates a new Template struct
+func New() *Templates {
+	t, err := compile("/template/templates/")
 	if err != nil {
-		return nil, err
+		log.Fatalln(err)
 	}
 
-	return t, nil
+	return &Templates{
+		templates: t,
+	}
 }
 
 // Output renders the template corresponding to the name with the provided data
-func Output(n string, d interface{}) error {
-	t, err := getTemplate(n)
-	if err != nil {
-		return err
-	}
-
-	if err := t.Execute(os.Stdout, d); err != nil {
+func (t *Templates) Output(n string, d interface{}) error {
+	if err := t.templates.ExecuteTemplate(os.Stdout, n, d); err != nil {
 		return err
 	}
 	return nil
 }
 
 // AsString renders the template corresponding to the name with the provided data
-func AsString(n string, d interface{}) (s string, err error) {
-	t, err := getTemplate(n)
-	if err != nil {
-		return s, err
-	}
-
+func (t *Templates) AsString(n string, d interface{}) (s string, err error) {
 	var buf bytes.Buffer
-	if err := t.Execute(&buf, d); err != nil {
+	if err := t.templates.ExecuteTemplate(&buf, n, d); err != nil {
 		return s, err
 	}
 

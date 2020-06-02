@@ -2,3 +2,4 @@ sax
 saxifrage
 *.zip
 .github/.access_token
+pkged.go

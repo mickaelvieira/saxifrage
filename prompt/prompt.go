@@ -28,15 +28,27 @@ const (
 	MsgConfirmDeleteLines  = "Do you want to delete(d) or comment(c) those lines?"
 )
 
+// New creates a new prompt
+func New(t *template.Templates) *Prompt {
+	return &Prompt{
+		templates: t,
+	}
+}
+
+// Prompt the user
+type Prompt struct {
+	templates *template.Templates
+}
+
 // Msg output a message in the console
-func Msg(m string) error {
+func (p *Prompt) Msg(m string) error {
 	o := struct {
 		Text string
 	}{
 		Text: m,
 	}
 
-	if err := template.Output("message", o); err != nil {
+	if err := p.templates.Output("message", o); err != nil {
 		return err
 	}
 
@@ -44,7 +56,7 @@ func Msg(m string) error {
 }
 
 // Confirm asks for user confirmation
-func Confirm(t string) (bool, error) {
+func (p *Prompt) Confirm(t string) (bool, error) {
 	o := struct {
 		Text    string
 		Default string
@@ -54,7 +66,7 @@ func Confirm(t string) (bool, error) {
 
 	var c bool
 
-	if err := template.Output("ask-confirm", o); err != nil {
+	if err := p.templates.Output("ask-confirmation", o); err != nil {
 		return c, err
 	}
 
@@ -75,7 +87,7 @@ func Confirm(t string) (bool, error) {
 }
 
 // Prompt prompts user
-func Prompt(t string, d string) (string, error) {
+func (p *Prompt) Prompt(t string, d string) (string, error) {
 	o := struct {
 		Text    string
 		Default string
@@ -86,7 +98,7 @@ func Prompt(t string, d string) (string, error) {
 
 	var i string
 
-	if err := template.Output("read-input", o); err != nil {
+	if err := p.templates.Output("read-input", o); err != nil {
 		return i, err
 	}
 

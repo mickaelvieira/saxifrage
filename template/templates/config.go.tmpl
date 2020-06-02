@@ -1,0 +1,6 @@
+{{ define "config" }}
+Host {{ .Host }}
+{{ if .User }}    User {{ .User }}{{ end }}
+    Port {{ .Port }}
+    IdentityFile {{ .IdentityFile }}
+{{ end }}

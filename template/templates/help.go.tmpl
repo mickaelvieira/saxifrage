@@ -1,0 +1,11 @@
+{{ define "help" }}
+ NAME:
+  {{ .App.Name }} {{ .App.Version }} - {{ .App.Usage }}
+
+ USAGE:
+  {{ .App.Executable }} [command]
+
+ COMMANDS:
+{{ range $name, $usage := .Commands}}
+  {{ $name }}    {{ $usage }}{{ end }}
+{{ end }}

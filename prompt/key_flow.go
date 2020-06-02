@@ -56,10 +56,10 @@ func askForKeySize(o *keys.Options) error {
 	return nil
 }
 
-func askForKeyDirectory(o *keys.Options) error {
+func askForKeyDirectory(p *Prompt, o *keys.Options) error {
 	o.Directory = keys.GetDir("")
 
-	r, err := Prompt(MsgPromptKeyDirectory, o.Directory)
+	r, err := p.Prompt(MsgPromptKeyDirectory, o.Directory)
 	if err != nil {
 		return err
 	}
@@ -70,8 +70,8 @@ func askForKeyDirectory(o *keys.Options) error {
 	return nil
 }
 
-func askForKeyPassPhrase(o *keys.Options) error {
-	r, err := Prompt(MsgPromptKeyPassphrase, "")
+func askForKeyPassPhrase(p *Prompt, o *keys.Options) error {
+	r, err := p.Prompt(MsgPromptKeyPassphrase, "")
 	if err != nil {
 		return err
 	}
@@ -80,9 +80,9 @@ func askForKeyPassPhrase(o *keys.Options) error {
 	return nil
 }
 
-func askForKeyName(o *keys.Options) error {
+func askForKeyName(p *Prompt, o *keys.Options) error {
 	s, _ := keys.GetFilenamesFromType(o.KeyType)
-	r, err := Prompt(MsgPromptKeyFilename, s)
+	r, err := p.Prompt(MsgPromptKeyFilename, s)
 	if err != nil {
 		return err
 	}
@@ -99,19 +99,19 @@ func askForKeyName(o *keys.Options) error {
 }
 
 // KeyFlow prompts user to get the keys options
-func KeyFlow() (*keys.Options, error) {
+func KeyFlow(p *Prompt) (*keys.Options, error) {
 	o := &keys.Options{}
 
 	if err := askForKeyType(o); err != nil {
 		return nil, err
 	}
-	if err := askForKeyDirectory(o); err != nil {
+	if err := askForKeyDirectory(p, o); err != nil {
 		return nil, err
 	}
-	if err := askForKeyName(o); err != nil {
+	if err := askForKeyName(p, o); err != nil {
 		return nil, err
 	}
-	if err := askForKeyPassPhrase(o); err != nil {
+	if err := askForKeyPassPhrase(p, o); err != nil {
 		return nil, err
 	}
 	if err := askForKeySize(o); err != nil {

@@ -1,0 +1,13 @@
+{{ define "list" }}
+{{ range .Files }}
+{{ divider | bold }}
+ {{ "File" | bold }} {{ .Path | bold | green  }}
+{{ divider | bold }}{{ $l := len .BuildSections }}
+{{ if eq $l 0 }}
+ No sections have been defined in this file
+{{ else }}{{ range .BuildSections }}
+ {{ .Type | bold }}{{ .Separator }}{{ .Matching | green | bold }}
+{{ range .Options }}
+     {{ .Name | bold }}{{ .Separator }}{{ .Value | green | bold }}{{ end }}
+{{ end }}{{ end }}{{ end }}
+{{ end }}

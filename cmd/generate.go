@@ -7,20 +7,19 @@ import (
 	"github.com/mickaelvieira/saxifrage/keys"
 	"github.com/mickaelvieira/saxifrage/parser"
 	"github.com/mickaelvieira/saxifrage/prompt"
-	"github.com/mickaelvieira/saxifrage/template"
 )
 
 func runGenerate(a *App) error {
-	keyOpts, err := prompt.KeyFlow()
+	keyOpts, err := prompt.KeyFlow(a.Prompt)
 	if err != nil {
 		return err
 	}
 
-	if e := template.Output("summary", keyOpts); e != nil {
+	if e := a.Templates.Output("summary", keyOpts); e != nil {
 		return e
 	}
 
-	confirm, err := prompt.Confirm(prompt.MsgConfirmContinue)
+	confirm, err := a.Prompt.Confirm(prompt.MsgConfirmContinue)
 	if err != nil {
 		return err
 	}
@@ -28,7 +27,7 @@ func runGenerate(a *App) error {
 	if confirm {
 		// make sure we don't override an exiting key
 		if _, err := os.Stat(keyOpts.PrivateKey); err == nil {
-			override, err := prompt.Confirm(prompt.MsgConfirmOverride)
+			override, err := a.Prompt.Confirm(prompt.MsgConfirmOverride)
 			if err != nil {
 				return err
 			}
@@ -37,7 +36,7 @@ func runGenerate(a *App) error {
 			}
 		}
 
-		if err := prompt.Msg(prompt.MsgGeneratingKeys); err != nil {
+		if err := a.Prompt.Msg(prompt.MsgGeneratingKeys); err != nil {
 			return err
 		}
 
@@ -54,17 +53,17 @@ func runGenerate(a *App) error {
 		if e := keys.Writekeys(publicKey, privateKey, keyOpts); e != nil {
 			return e
 		}
-		if e := prompt.Msg(prompt.MsgKeyGenerated); e != nil {
+		if e := a.Prompt.Msg(prompt.MsgKeyGenerated); e != nil {
 			return e
 		}
 
-		confirm, err := prompt.Confirm(prompt.MsgConfirmAddition)
+		confirm, err := a.Prompt.Confirm(prompt.MsgConfirmAddition)
 		if err != nil {
 			return err
 		}
 
 		if confirm {
-			configOpts, err := prompt.ConfigFlow(config.ToRelativePath(keyOpts.PrivateKey))
+			configOpts, err := prompt.ConfigFlow(a.Prompt, config.ToRelativePath(keyOpts.PrivateKey))
 			if err != nil {
 				return err
 			}
@@ -79,7 +78,7 @@ func runGenerate(a *App) error {
 				return config.ErrMissingUserConfig
 			}
 
-			s, err := template.AsString("config", configOpts)
+			s, err := a.Templates.AsString("config", configOpts)
 			if err != nil {
 				return err
 			}
@@ -94,7 +93,7 @@ func runGenerate(a *App) error {
 			if err := config.WriteToFile(f.Bytes()); err != nil {
 				return err
 			}
-			if err := prompt.Msg(prompt.MsgConfigGenerated); err != nil {
+			if err := a.Prompt.Msg(prompt.MsgConfigGenerated); err != nil {
 				return nil
 			}
 		}

@@ -1,0 +1,6 @@
+{{ define "summary" }}
+ {{ "You are about to create the following SSH key" | bold }}
+ {{ "Type:    " | bold }} {{ .KeyType | bold | green }}
+ {{ "Private: " | bold }} {{ .PrivateKey | bold | green }}
+ {{ "Public:  " | bold }} {{ .PublicKey | bold | green }}
+{{ end }}

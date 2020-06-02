@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/mickaelvieira/saxifrage/config"
 	"github.com/mickaelvieira/saxifrage/parser"
-	"github.com/mickaelvieira/saxifrage/template"
 )
 
 func runDump(a *App) error {
@@ -18,7 +17,7 @@ func runDump(a *App) error {
 		Files: files,
 	}
 
-	if err := template.Output("dump", d); err != nil {
+	if err := a.Templates.Output("dump", d); err != nil {
 		return err
 	}
 

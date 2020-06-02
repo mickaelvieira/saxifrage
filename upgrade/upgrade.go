@@ -32,10 +32,10 @@ func CompareVersions(c, l string) (bool, error) {
 }
 
 // Download download the zip file from github and write it into a file
-func Download(filename, version string) error {
+func Download(p *prompt.Prompt, filename, version string) error {
 	url := fmt.Sprintf(archiveURL, version, filename)
 
-	if e := prompt.Msg(fmt.Sprintf("downloading %s", url)); e != nil {
+	if e := p.Msg(fmt.Sprintf("downloading %s", url)); e != nil {
 		return e
 	}
 	r, err := http.Get(url) // #nosec

@@ -6,6 +6,8 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/mickaelvieira/saxifrage/keys"
+	"github.com/mickaelvieira/saxifrage/prompt"
+	"github.com/mickaelvieira/saxifrage/template"
 )
 
 // App a cli application
@@ -15,6 +17,8 @@ type App struct {
 	Version    string
 	Usage      string
 	Commands   commands
+	Templates  *template.Templates
+	Prompt     *prompt.Prompt
 }
 
 type commands []*command
@@ -71,10 +75,13 @@ func (a *App) find(name string) *command {
 
 // New creates a new application
 func New(v string) *App {
+	t := template.New()
 	a := &App{
-		Name:    "Saxifrage",
-		Version: v,
-		Usage:   "A CLI tool to manage your SSH keys",
+		Name:      "Saxifrage",
+		Version:   v,
+		Usage:     "A CLI tool to manage your SSH keys",
+		Templates: t,
+		Prompt:    prompt.New(t),
 	}
 
 	a.Commands = make(commands, 8)

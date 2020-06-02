@@ -8,7 +8,6 @@ import (
 	"github.com/mickaelvieira/saxifrage/config"
 	"github.com/mickaelvieira/saxifrage/parser"
 	"github.com/mickaelvieira/saxifrage/prompt"
-	"github.com/mickaelvieira/saxifrage/template"
 )
 
 func runRemove(a *App) error {
@@ -59,11 +58,11 @@ func runRemove(a *App) error {
 	}
 
 	if len(keyFiles) > 0 {
-		if err := template.Output("files", d); err != nil {
+		if err := a.Templates.Output("files", d); err != nil {
 			return err
 		}
 
-		confirm, err := prompt.Confirm(prompt.MsgConfirmDeleteFiles)
+		confirm, err := a.Prompt.Confirm(prompt.MsgConfirmDeleteFiles)
 		if err != nil {
 			return err
 		}
@@ -84,11 +83,11 @@ func runRemove(a *App) error {
 	}
 
 	if len(lines) > 0 {
-		if err := template.Output("lines", d); err != nil {
+		if err := a.Templates.Output("lines", d); err != nil {
 			return err
 		}
 
-		r, err := prompt.Prompt(prompt.MsgConfirmDeleteLines, "d")
+		r, err := a.Prompt.Prompt(prompt.MsgConfirmDeleteLines, "d")
 		if err != nil {
 			return err
 		}
