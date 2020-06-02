@@ -20,24 +20,34 @@ $ sudo chmod u+x /usr/local/bin/sax
 $ sax upgrade
 ```
 
+## Bash completion
+
+```sh
+$ sax completion > sax.sh
+$ sudo mv ./sax.sh /usr/share/bash-completion/completions/sax
+$ source /usr/share/bash-completion/completions/sax
+```
+
 ## Usage
 
 ```sh
 $ sax
 
  NAME:
-  sax - A CLI tool to manage your SSH keys
+  Saxifrage 0.4.0 - A CLI tool to manage your SSH keys
 
  USAGE:
-  sax [command]
+  saxifrage [command]
 
  COMMANDS:
 
-  dump       Dump your SSH configuration
-  gen        Generate interactively a SSH key (rsa, dsa, ecdsa, ed25519)
-  help       Show this help
-  ls         List SSH configuration sections
-  rm         Remove interactively a section and its related SSH keys
-  upgrade    Upgrade saxifrage
-  version    Display the application version
+  completion    Generate bash completion
+  dump          Dump your SSH configuration
+  gen           Generate interactively a SSH key (rsa, dsa, ecdsa, ed25519)
+  help          Show this help
+  ls            List SSH configuration sections
+  rm            Remove interactively a section and its related SSH keys
+  upgrade       Upgrade Saxifrage
+  version       Display the application version
+
 ```
