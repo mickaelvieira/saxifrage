@@ -6,14 +6,19 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/mickaelvieira/saxifrage/keys"
+	"github.com/mickaelvieira/saxifrage/prompt"
+	"github.com/mickaelvieira/saxifrage/template"
 )
 
 // App a cli application
 type App struct {
-	Name     string
-	Version  string
-	Usage    string
-	Commands commands
+	Name       string
+	Executable string
+	Version    string
+	Usage      string
+	Commands   commands
+	Templates  *template.Templates
+	Prompt     *prompt.Prompt
 }
 
 type commands []*command
@@ -38,7 +43,7 @@ func (a *App) Run(args []string) error {
 		return fmt.Errorf("Cannot run the application. Arguments are missing")
 	}
 
-	a.Name = filepath.Base(args[0])
+	a.Executable = filepath.Base(args[0])
 
 	n := "help"
 	if len(args) > 1 {
@@ -70,19 +75,24 @@ func (a *App) find(name string) *command {
 
 // New creates a new application
 func New(v string) *App {
+	t := template.New()
 	a := &App{
-		Version: v,
-		Usage:   "A CLI tool to manage your SSH keys",
+		Name:      "Saxifrage",
+		Version:   v,
+		Usage:     "A CLI tool to manage your SSH keys",
+		Templates: t,
+		Prompt:    prompt.New(t),
 	}
 
-	a.Commands = make(commands, 7)
+	a.Commands = make(commands, 8)
 	a.Commands[0] = &command{Name: "gen", Usage: fmt.Sprintf("Generate interactively a SSH key (%s)", keys.TypesToString()), Action: runGenerate}
 	a.Commands[1] = &command{Name: "ls", Usage: "List SSH configuration sections", Action: runList}
 	a.Commands[2] = &command{Name: "dump", Usage: "Dump your SSH configuration", Action: runDump}
 	a.Commands[3] = &command{Name: "rm", Usage: "Remove interactively a section and its related SSH keys", Action: runRemove}
 	a.Commands[4] = &command{Name: "help", Usage: "Show this help", Action: runHelp}
-	a.Commands[5] = &command{Name: "upgrade", Usage: "Upgrade saxifrage", Action: runUpgrade}
+	a.Commands[5] = &command{Name: "upgrade", Usage: fmt.Sprintf("Upgrade %s", a.Name), Action: runUpgrade}
 	a.Commands[6] = &command{Name: "version", Usage: "Display the application version", Action: runVersion}
+	a.Commands[7] = &command{Name: "completion", Usage: "Generate bash completion", Action: runCompletion}
 
 	return a
 }

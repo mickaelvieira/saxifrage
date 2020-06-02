@@ -1,0 +1,1 @@
+{{ define "read-input" }}{{ "✔ " | green }}{{ .Text | bold }}{{ if .Default }} {{ printf "%s%s%s" "(" .Default ")" | faint }}{{ end }}{{ ": " | bold }}{{ end }}

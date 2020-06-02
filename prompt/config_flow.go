@@ -2,8 +2,8 @@ package prompt
 
 import "github.com/mickaelvieira/saxifrage/config"
 
-func askForKeyHost(o *config.Generated) error {
-	r, err := Prompt(MsgPromptKeyHost, "")
+func askForKeyHost(p *Prompt, o *config.Generated) error {
+	r, err := p.Prompt(MsgPromptKeyHost, "")
 	if err != nil {
 		return err
 	}
@@ -11,9 +11,9 @@ func askForKeyHost(o *config.Generated) error {
 	return nil
 }
 
-func askForPort(o *config.Generated) error {
+func askForPort(p *Prompt, o *config.Generated) error {
 	o.Port = "22"
-	r, err := Prompt(MsgPromptKeyPort, o.Port)
+	r, err := p.Prompt(MsgPromptKeyPort, o.Port)
 	if err != nil {
 		return err
 	}
@@ -23,8 +23,8 @@ func askForPort(o *config.Generated) error {
 	return nil
 }
 
-func askForUser(o *config.Generated) error {
-	r, err := Prompt(MsgPromptKeyUser, "")
+func askForUser(p *Prompt, o *config.Generated) error {
+	r, err := p.Prompt(MsgPromptKeyUser, "")
 	if err != nil {
 		return err
 	}
@@ -33,16 +33,16 @@ func askForUser(o *config.Generated) error {
 }
 
 // ConfigFlow prompts user to get the configuration options
-func ConfigFlow(p string) (*config.Generated, error) {
-	o := &config.Generated{IdentityFile: p}
+func ConfigFlow(p *Prompt, k string) (*config.Generated, error) {
+	o := &config.Generated{IdentityFile: k}
 
-	if err := askForKeyHost(o); err != nil {
+	if err := askForKeyHost(p, o); err != nil {
 		return nil, err
 	}
-	if err := askForPort(o); err != nil {
+	if err := askForPort(p, o); err != nil {
 		return nil, err
 	}
-	if err := askForUser(o); err != nil {
+	if err := askForUser(p, o); err != nil {
 		return nil, err
 	}
 

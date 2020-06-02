@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/mickaelvieira/saxifrage/prompt"
 	"github.com/mickaelvieira/saxifrage/upgrade"
 )
 
@@ -15,7 +14,7 @@ func runUpgrade(a *App) error {
 		return err
 	}
 
-	if e := prompt.Msg("Checking for latest version"); e != nil {
+	if e := a.Prompt.Msg("Checking for latest version"); e != nil {
 		return e
 	}
 
@@ -24,7 +23,7 @@ func runUpgrade(a *App) error {
 		return err
 	}
 
-	if e := prompt.Msg("Version has been found"); e != nil {
+	if e := a.Prompt.Msg("Version has been found"); e != nil {
 		return e
 	}
 
@@ -34,7 +33,7 @@ func runUpgrade(a *App) error {
 	}
 
 	if shouldUpdate {
-		if e := prompt.Msg(fmt.Sprintf("%s is upgrading to version %s", a.Name, latest)); e != nil {
+		if e := a.Prompt.Msg(fmt.Sprintf("%s is upgrading to version %s", a.Name, latest)); e != nil {
 			return e
 		}
 
@@ -47,7 +46,7 @@ func runUpgrade(a *App) error {
 		}
 		defer os.RemoveAll(tempDir)
 
-		if e := upgrade.Download(filename, latest); e != nil {
+		if e := upgrade.Download(a.Prompt, filename, latest); e != nil {
 			return e
 		}
 
@@ -61,7 +60,7 @@ func runUpgrade(a *App) error {
 			return e
 		}
 	} else {
-		if e := prompt.Msg(fmt.Sprintf("%s is already up-to-date", a.Name)); e != nil {
+		if e := a.Prompt.Msg(fmt.Sprintf("%s is already up-to-date", a.Name)); e != nil {
 			return e
 		}
 	}

@@ -1,0 +1,9 @@
+{{ define "dump" }}
+{{ range .Files }}
+{{ divider | bold }}
+ {{ "File" | bold }} {{ .Path | bold | green  }}
+{{ divider | bold }}
+
+{{ range .Lines}}{{ .Number | green | bold }}  {{ . }}{{ end }}
+{{ end }}
+{{ end }}

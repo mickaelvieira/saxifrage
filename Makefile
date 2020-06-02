@@ -9,6 +9,7 @@ APP_VERSION := $(shell cat .github/.version)
 GO_LDFLAGS  := -ldflags "-s -w -X main.version=$(APP_VERSION)"
 
 build:
+	go generate
 	CGO_ENABLED=0 go build $(GO_LDFLAGS)
 
 binaries:
@@ -33,4 +34,3 @@ lint:
 	$(GOVET) ./...
 	$(GOSEC) ./...
 	$(GOSHDW) ./...
-
