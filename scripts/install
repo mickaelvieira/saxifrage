@@ -1,0 +1,66 @@
+#!/bin/sh
+
+set -e -u
+# set -x
+
+lib_name=saxifrage
+arch=$(uname -m)
+os=$(uname -s)
+vendor=mickaelvieira
+repo=saxifrage
+
+get_install_dir() {
+  if [ -d "${HOME}/Applications" ]; then
+    echo "${HOME}/Applications"
+  elif [ -d "${HOME}/.local/bin" ]; then
+    echo "${HOME}/.local/bin"
+  else
+    echo "${HOME}/.${lib_name}"
+  fi
+}
+
+check_platform() {
+  if [ "$arch" != x86_64 ]; then
+    echo "Error: Unsupported architecture $arch. Only x64 binaries are available." 1>&2
+    exit 1
+  fi
+
+  if [ "$os" != Linux ] && [ "$os" != Darwin ]; then
+    echo "Error: Unsupported operation system $os. Only Linux and Darwin are supported." 1>&2
+    exit 1
+  fi
+
+  if ! command -v unzip >/dev/null; then
+    echo "Error: unzip is required to install Saxifrage." 1>&2
+    exit 1
+  fi
+}
+
+install() {
+  version=$(curl -sSf https://raw.githubusercontent.com/${vendor}/${repo}/master/.github/.version)
+  source="https://github.com/${vendor}/${repo}/releases/download/v$version/${lib_name}-${os,,}-amd64.zip"
+
+  bin_dir=$(get_install_dir)
+  bin_file="$bin_dir/sax"
+  archive="$bin_file.zip"
+
+  if [ ! -d "$bin_dir" ]; then
+    mkdir -p "$bin_dir"
+  fi
+
+  curl --fail --location --progress-bar --output "$archive" "$source"
+
+  cd "$bin_dir"
+  unzip -o "$archive"
+  chmod +x "$bin_file"
+  rm "$archive"
+
+  echo "${lib_name} was installed successfully in $bin_dir"
+}
+
+main() {
+  check_platform
+  install
+}
+
+main
