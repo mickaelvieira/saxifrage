@@ -12,7 +12,7 @@ repo=saxifrage
 get_install_dir() {
   if [ -d "${HOME}/Applications" ]; then
     echo "${HOME}/Applications"
-  elif [ -d "${HOME}/.local/bin" ]; then
+  elif [ -d "${HOME}/.local" ]; then
     echo "${HOME}/.local/bin"
   else
     echo "${HOME}/.${lib_name}"
