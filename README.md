@@ -32,7 +32,7 @@ $ source /usr/share/bash-completion/completions/sax
 $ sax
 
  NAME:
-  Saxifrage 0.4.0 - A CLI tool to manage your SSH keys
+  Saxifrage - A CLI tool to manage your SSH keys
 
  USAGE:
   sax [command]
