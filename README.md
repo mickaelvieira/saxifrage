@@ -9,9 +9,7 @@ A CLI tool to manage your SSH keys
 Download the latest version corresponding to your platform from the [releases](https://github.com/mickaelvieira/saxifrage/releases) page
 
 ```sh
-$ unzip saxifrage-linux-amd64.zip
-$ sudo mv sax /usr/local/bin/
-$ sudo chmod u+x /usr/local/bin/sax
+$ curl -fsSL https://raw.githubusercontent.com/mickaelvieira/saxifrage/master/scripts/install | sh
 ```
 
 ## Upgrade
