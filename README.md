@@ -6,8 +6,6 @@ A CLI tool to manage your SSH keys
 
 ## Install
 
-Download the latest version corresponding to your platform from the [releases](https://github.com/mickaelvieira/saxifrage/releases) page
-
 ```sh
 $ curl -fsSL https://raw.githubusercontent.com/mickaelvieira/saxifrage/master/scripts/install | sh
 ```
