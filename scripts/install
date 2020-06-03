@@ -1,0 +1,68 @@
+#!/bin/bash
+# shellcheck disable=SC2155
+
+set -e -u -o pipefail
+# set -x
+
+declare -r lib_name=saxifrage
+declare -r arch=$(uname -m)
+declare -r os=$(uname -s)
+declare -r vendor=mickaelvieira
+declare -r repo=saxifrage
+
+get_shell_profile() {
+  case $SHELL in
+  /bin/zsh) echo ".zshrc" ;;
+  *) echo ".bash_profile" ;;
+  esac
+}
+
+check_platform() {
+  if [[ $arch != x86_64 ]]; then
+    echo "Error: Unsupported architecture $arch. Only x64 binaries are available." 1>&2
+    exit 1
+  fi
+
+  if [[ $os != Linux && $os != Darwin ]]; then
+    echo "Error: Unsupported operation system $os. Only Linux and Darwin are supported." 1>&2
+    exit 1
+  fi
+
+  if ! command -v unzip >/dev/null; then
+    echo "Error: unzip is required to install Saxifrage." 1>&2
+    exit 1
+  fi
+}
+
+install() {
+  shell_profile=$(get_shell_profile)
+  version=$(curl -sSf https://raw.githubusercontent.com/${vendor}/${repo}/master/.github/.version)
+  source="https://github.com/${vendor}/${repo}/releases/download/v$version/${lib_name}-${os,,}-amd64.zip"
+
+  local install_dir="${HOME}/.${lib_name}"
+  local bin_dir="${install_dir}/bin"
+  local bin_file="$bin_dir/sax"
+  local archive="$bin_file.zip"
+
+  if [[ ! -d "$bin_dir" ]]; then
+    mkdir -p "$bin_dir"
+  fi
+
+  curl --fail --location --progress-bar --output "$archive" "$source"
+
+  cd "$bin_dir"
+  unzip -o "$archive"
+  chmod +x "$bin_file"
+  rm "$archive"
+
+  echo "Saxifrage was installed successfully in $bin_dir"
+  echo "Manually add the directory to your \$HOME/$shell_profile"
+  echo "  export PATH=\"\${bin_dir}:\$PATH\""
+}
+
+main() {
+  check_platform
+  install
+}
+
+main
