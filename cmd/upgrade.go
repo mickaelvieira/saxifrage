@@ -36,8 +36,11 @@ func runUpgrade(a *App) error {
 		if e := a.Prompt.Msg(fmt.Sprintf("%s is upgrading to version %s", a.Name, latest)); e != nil {
 			return e
 		}
-
-		tempDir, err := ioutil.TempDir(os.TempDir(), "saxifrage-*")
+		binDir, err := upgrade.GetExecutableDir()
+		if err != nil {
+			return err
+		}
+		tempDir, err := ioutil.TempDir(binDir, "saxifrage-*")
 		if err != nil {
 			return err
 		}
@@ -49,14 +52,13 @@ func runUpgrade(a *App) error {
 		if e := upgrade.Download(a.Prompt, filename, latest); e != nil {
 			return e
 		}
-
-		out, err := upgrade.Unpack(filename)
-		fmt.Printf("%s", out)
-		if err != nil {
-			return err
+		if e := upgrade.Unpack(filename); e != nil {
+			return e
 		}
-
-		if e := upgrade.ReplaceBinary(); e != nil {
+		if e := upgrade.ReplaceBinary(binDir); e != nil {
+			return e
+		}
+		if e := a.Prompt.Msg(fmt.Sprintf("%s was upgraded successfully", a.Name)); e != nil {
 			return e
 		}
 	} else {

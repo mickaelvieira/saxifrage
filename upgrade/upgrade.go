@@ -18,6 +18,19 @@ const binFile = "sax"
 const archiveURL = "https://github.com/mickaelvieira/saxifrage/releases/download/v%s/%s"
 const versionFile = "https://raw.githubusercontent.com/mickaelvieira/saxifrage/master/.github/.version"
 
+// GetExecutableDir returns the directory from which the binary is running
+func GetExecutableDir() (string, error) {
+	path, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+	path, err = filepath.EvalSymlinks(path)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Dir(path), nil
+}
+
 // CompareVersions compares the current and the latest versions
 func CompareVersions(c, l string) (bool, error) {
 	current, err := version.NewVersion(c)
@@ -57,9 +70,13 @@ func Download(p *prompt.Prompt, filename, version string) error {
 }
 
 // Unpack unzips the file
-func Unpack(file string) ([]byte, error) {
+func Unpack(file string) error {
 	cmd := exec.Command("unzip", file) // #nosec
-	return cmd.Output()
+	out, err := cmd.Output()
+	if err == nil {
+		fmt.Printf("%s", out)
+	}
+	return err
 }
 
 // GetLatestVersion fetches the latest application's version from the github repository
@@ -95,23 +112,10 @@ func GetPlatformArchiveName() (string, error) {
 }
 
 // ReplaceBinary replaces the existing binary file
-func ReplaceBinary() error {
-	dir, err := os.Executable()
-	if err != nil {
-		return err
-	}
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		return err
-	}
-	dir = filepath.Dir(dir)
-
+func ReplaceBinary(binDir string) error {
 	source := filepath.Clean(fmt.Sprintf("./%s", binFile))
-	destination := filepath.Clean(fmt.Sprintf("%s/%s", dir, binFile))
+	destination := filepath.Clean(fmt.Sprintf("%s/%s", binDir, binFile))
 
-	// Since it is not possible to rename a file across different partitions
-	// this line will fail if the binary is not on the same partition than the "tmp" directory/
-	// A solution to this issue could be to copy the file to the partition first and then rename it.
 	if e := os.Rename(source, destination); e != nil {
 		return e
 	}
