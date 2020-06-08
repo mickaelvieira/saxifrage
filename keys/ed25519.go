@@ -31,7 +31,7 @@ type ED25519Generator struct {
 	pk  ed25519.PublicKey
 }
 
-// GenPublicKey ...
+// GenPublicKey generates a ED25519 public key
 func (g *ED25519Generator) GenPublicKey() ([]byte, error) {
 	if g.pk == nil {
 		return nil, ErrPrivateKeyNotGenerated
@@ -45,7 +45,7 @@ func (g *ED25519Generator) GenPublicKey() ([]byte, error) {
 	return ssh.MarshalAuthorizedKey(key), nil
 }
 
-// GenPrivateKey ...
+// GenPrivateKey generates a ED25519 private key
 func (g *ED25519Generator) GenPrivateKey() ([]byte, error) {
 	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {

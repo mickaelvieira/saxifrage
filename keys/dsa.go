@@ -51,7 +51,7 @@ type DSAGenerator struct {
 	pk  *dsa.PrivateKey
 }
 
-// GenPublicKey ...
+// GenPublicKey generates a DSA public key
 func (g *DSAGenerator) GenPublicKey() ([]byte, error) {
 	if g.pk == nil {
 		return nil, ErrPrivateKeyNotGenerated
@@ -65,7 +65,7 @@ func (g *DSAGenerator) GenPublicKey() ([]byte, error) {
 	return ssh.MarshalAuthorizedKey(key), nil
 }
 
-// GenPrivateKey ...
+// GenPrivateKey generates a DSA private key
 func (g *DSAGenerator) GenPrivateKey() ([]byte, error) {
 	ks, ok := g.ks.(dsa.ParameterSizes)
 	if !ok {

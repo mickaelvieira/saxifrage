@@ -13,18 +13,6 @@ import (
 	"github.com/markbates/pkger"
 )
 
-// GetMaxLen returns the length of the longest string
-func GetMaxLen(i []string) int {
-	var max int
-	for _, s := range i {
-		l := len(s)
-		if l > max {
-			max = l
-		}
-	}
-	return max
-}
-
 // Divider helper tp create a dividing line
 func Divider() string {
 	return fmt.Sprintf("=====================================================")
