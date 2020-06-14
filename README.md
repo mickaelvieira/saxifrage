@@ -9,7 +9,7 @@ A CLI tool to manage your SSH keys
 ```sh
 $ curl -fsSL https://raw.githubusercontent.com/mickaelvieira/saxifrage/stable/scripts/install | sh
 ```
-stable
+
 ## Upgrade
 
 ```sh
