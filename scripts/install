@@ -37,7 +37,7 @@ check_platform() {
 }
 
 install() {
-  version=$(curl -sSf https://raw.githubusercontent.com/${vendor}/${repo}/master/.github/.version)
+  version=$(curl -sSf https://raw.githubusercontent.com/${vendor}/${repo}/stable/.github/.version)
   source="https://github.com/${vendor}/${repo}/releases/download/v$version/${lib_name}-${os,,}-amd64.zip"
 
   bin_dir=$(get_install_dir)

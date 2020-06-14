@@ -16,7 +16,7 @@ import (
 
 const binFile = "sax"
 const archiveURL = "https://github.com/mickaelvieira/saxifrage/releases/download/v%s/%s"
-const versionFile = "https://raw.githubusercontent.com/mickaelvieira/saxifrage/master/.github/.version"
+const versionFile = "https://raw.githubusercontent.com/mickaelvieira/saxifrage/stable/.github/.version"
 
 // GetExecutableDir returns the directory from which the binary is running
 func GetExecutableDir() (string, error) {

@@ -1,6 +1,6 @@
 # Saxifrage
 
-[![Saxifrage](https://github.com/mickaelvieira/saxifrage/workflows/Saxifrage/badge.svg)](https://github.com/mickaelvieira/saxifrage/actions) [![Go Report Card](https://goreportcard.com/badge/github.com/mickaelvieira/saxifrage)](https://goreportcard.com/report/github.com/mickaelvieira/saxifrage) [![GitHub](https://img.shields.io/github/license/mickaelvieira/saxifrage)](https://github.com/mickaelvieira/saxifrage/blob/master/LICENSE.md)
+[![Saxifrage](https://github.com/mickaelvieira/saxifrage/workflows/Saxifrage/badge.svg)](https://github.com/mickaelvieira/saxifrage/actions) [![Go Report Card](https://goreportcard.com/badge/github.com/mickaelvieira/saxifrage)](https://goreportcard.com/report/github.com/mickaelvieira/saxifrage) [![GitHub](https://img.shields.io/github/license/mickaelvieira/saxifrage)](https://github.com/mickaelvieira/saxifrage/blob/stable/LICENSE.md)
 
 A CLI tool to manage your SSH keys
 
@@ -9,7 +9,7 @@ A CLI tool to manage your SSH keys
 ```sh
 $ curl -fsSL https://raw.githubusercontent.com/mickaelvieira/saxifrage/master/scripts/install | sh
 ```
-
+stable
 ## Upgrade
 
 ```sh

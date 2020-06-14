@@ -143,9 +143,9 @@ create_next_release_branch() {
 
 main() {
     local branch="$(get_branch)"
-    [[ "$branch" != master ]] && git checkout master
+    [[ "$branch" != stable ]] && git checkout stable
 
-    git pull origin master
+    git pull origin stable
 
     local version="$(get_version)"
     create_next_release_branch "$version"
