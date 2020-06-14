@@ -2,11 +2,11 @@ name: Saxifrage Checks
 on:
   push:
     branches:
-      - master
+      - stable
       - 'release/*'
   pull_request:
     branches:
-      - master
+      - stable
       - 'release/*'
 jobs:
   build:

@@ -51,7 +51,7 @@ type ECDSAGenerator struct {
 	pk  *ecdsa.PrivateKey
 }
 
-// GenPublicKey ...
+// GenPublicKey generates a ECDSA public key
 func (g *ECDSAGenerator) GenPublicKey() ([]byte, error) {
 	if g.pk == nil {
 		return nil, ErrPrivateKeyNotGenerated
@@ -65,7 +65,7 @@ func (g *ECDSAGenerator) GenPublicKey() ([]byte, error) {
 	return ssh.MarshalAuthorizedKey(key), nil
 }
 
-// GenPrivateKey ...
+// GenPrivateKey generates a ECDSA private key
 func (g *ECDSAGenerator) GenPrivateKey() ([]byte, error) {
 	ks, ok := g.ks.(elliptic.Curve)
 	if !ok {

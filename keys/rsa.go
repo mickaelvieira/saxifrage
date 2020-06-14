@@ -53,7 +53,7 @@ type RSAGenerator struct {
 	pk  *rsa.PrivateKey
 }
 
-// GenPublicKey ...
+// GenPublicKey generates a RSA public key
 func (g *RSAGenerator) GenPublicKey() ([]byte, error) {
 	if g.pk == nil {
 		return nil, ErrPrivateKeyNotGenerated
@@ -67,7 +67,7 @@ func (g *RSAGenerator) GenPublicKey() ([]byte, error) {
 	return ssh.MarshalAuthorizedKey(key), nil
 }
 
-// GenPrivateKey ...
+// GenPrivateKey generates a RSA private key
 func (g *RSAGenerator) GenPrivateKey() ([]byte, error) {
 	ks, ok := g.ks.(int)
 	if !ok {

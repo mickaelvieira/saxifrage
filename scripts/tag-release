@@ -45,7 +45,7 @@ main() {
     local branch=$(get_branch)
     local tag=$(get_tag)
 
-    [[ "$branch" != master ]] && error "Your are not on the master branch mate."
+    [[ "$branch" != stable ]] && error "Your are not on the stable branch mate."
 
     local message=$(get_confirmation_message "$branch" "$tag")
 

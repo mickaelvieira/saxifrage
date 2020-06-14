@@ -3,12 +3,21 @@ package cmd
 import (
 	"fmt"
 	"strconv"
-
-	"github.com/mickaelvieira/saxifrage/template"
 )
 
+func getMaxLen(i []string) int {
+	var max int
+	for _, s := range i {
+		l := len(s)
+		if l > max {
+			max = l
+		}
+	}
+	return max
+}
+
 func getCommandList(a commands) map[string]string {
-	max := template.GetMaxLen(a.getNames())
+	max := getMaxLen(a.getNames())
 
 	m := make(map[string]string)
 	for _, c := range a {

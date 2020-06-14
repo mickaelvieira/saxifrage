@@ -38,7 +38,7 @@ get_payload() {
     cat <<EOM
 {
   "tag_name": "v$version",
-  "target_commitish": "master",
+  "target_commitish": "stable",
   "name": "v$version",
   "body": "Release of version $version",
   "draft": false,
@@ -68,7 +68,7 @@ main() {
     local version="$(get_version)"
     local credentials="$WD/.github/.access_token"
 
-    [[ "$branch" != master ]] && error "Your are not on the master branch mate."
+    [[ "$branch" != stable ]] && error "Your are not on the stable branch mate."
     [[ -f "$credentials" ]] || error "Access Token file does not exist"
 
     local token=$(get_access_token "$credentials")

@@ -6,7 +6,7 @@ type Generator interface {
 	GenPrivateKey() ([]byte, error)
 }
 
-// KeySize ...
+// KeySize interface describing how to retrieve KeySize struct
 type KeySize interface {
 	GetDefault() string
 	GetValues() []string

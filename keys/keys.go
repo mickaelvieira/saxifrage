@@ -93,8 +93,7 @@ func sortKeySizeValues(v []string) []string {
 	return v
 }
 
-// EncodeToPEM ...
-// https://golang.org/pkg/encoding/pem/#Block
+// EncodeToPEM encodes the key into PEM
 func EncodeToPEM(privateKey crypto.PrivateKey, pwd string) ([]byte, error) {
 	var der []byte
 	var err error
