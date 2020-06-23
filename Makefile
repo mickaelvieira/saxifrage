@@ -14,6 +14,9 @@ build:	## Build the binary for the current platform
 	go generate
 	CGO_ENABLED=0 go build $(GO_LDFLAGS)
 
+docker-build:	## Build application in a docker image
+	docker build  --rm --build-arg APP_VERSION=$(APP_VERSION) -t saxifrage:latest .
+
 binaries:	## Build and zip the binary for Linux and MacOS
 	./scripts/create-binaries
 
