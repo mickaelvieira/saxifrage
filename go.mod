@@ -3,7 +3,7 @@ module github.com/mickaelvieira/saxifrage
 go 1.14
 
 require (
-	github.com/hashicorp/go-version v1.2.1
+	github.com/hashicorp/go-version v1.3.0
 	github.com/manifoldco/promptui v0.8.0
 	github.com/markbates/pkger v0.17.1
 	github.com/stretchr/testify v1.7.0
