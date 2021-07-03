@@ -22,8 +22,8 @@ jobs:
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('go.mod') }}
-      - run: go install honnef.co/go/tools/cmd/staticcheck
-      - run: go install github.com/securego/gosec/cmd/gosec
+      - run: go install honnef.co/go/tools/cmd/staticcheck@latest
+      - run: go install github.com/securego/gosec/cmd/gosec@latest
       - uses: golangci/golangci-lint-action@v2
         with:
           version: latest
