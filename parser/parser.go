@@ -11,13 +11,8 @@ import (
 
 // Parser messages list
 const (
-	msgMissingKeywordValue = "a value was expected for keyword %s"
-	msgMissingSectionValue = "a value was expected for section %s"
-	msgLexerError          = "lexing error: %s"
-	msgIllegalToken        = "illegal token: %s"
-	msgUnexpectedToken     = "unexpected token"
-	msgNotEmptyGroup       = "token is not empty but not full either"
-	msgNullSection         = "cannot add options before declaring a section"
+	msgLexerError   = "lexing error: %s"
+	msgIllegalToken = "illegal token: %s"
 )
 
 // parser --
