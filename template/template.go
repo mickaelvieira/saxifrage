@@ -2,58 +2,26 @@ package template
 
 import (
 	"bytes"
-	"fmt"
-	"io/ioutil"
+	"embed"
 	"log"
 	"os"
 	"strings"
 	"text/template"
 
 	"github.com/manifoldco/promptui"
-	"github.com/markbates/pkger"
 )
+
+//go:embed templates/*.tmpl
+var content embed.FS
 
 // Divider helper tp create a dividing line
 func Divider() string {
-	return fmt.Sprintf("=====================================================")
+	return "====================================================="
 }
 
 // Line draws a line of the given length
 func Line(l int) string {
 	return strings.Repeat("-", l)
-}
-
-func compile(dir string) (*template.Template, error) {
-	fn := promptui.FuncMap
-	fn["divider"] = Divider
-	fn["line"] = Line
-
-	t := template.New("app-templates").Funcs(fn)
-
-	err := pkger.Walk(dir, func(path string, info os.FileInfo, _ error) error {
-		if info.IsDir() || !strings.HasSuffix(path, ".tmpl") {
-			return nil
-		}
-
-		f, err := pkger.Open(path)
-		if err != nil {
-			return err
-		}
-
-		b, err := ioutil.ReadAll(f)
-		if err != nil {
-			return err
-		}
-
-		_, err = t.Parse(string(b))
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-
-	return t, err
 }
 
 // Templates a template rendering
@@ -63,7 +31,12 @@ type Templates struct {
 
 // New creates a new Template struct
 func New() *Templates {
-	t, err := compile("/template/templates/")
+	fn := promptui.FuncMap
+	fn["divider"] = Divider
+	fn["line"] = Line
+
+	t := template.New("app-templates").Funcs(fn)
+	t, err := t.ParseFS(content, "templates/*.tmpl")
 	if err != nil {
 		log.Fatalln(err)
 	}

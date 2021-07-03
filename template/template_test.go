@@ -21,5 +21,4 @@ func TestDrawLine(t *testing.T) {
 		got := Line(tc.input)
 		assert.Equal(t, tc.want, got, "Test Case %d %v", i, tc)
 	}
-
 }

@@ -16,7 +16,6 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14'
-      - run: go install github.com/markbates/pkger/cmd/pkger
       - run: make binaries
       - uses: actions/create-release@v1.1.4
         id: release-id # to retrieve the release's info during the following step

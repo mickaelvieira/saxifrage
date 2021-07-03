@@ -24,7 +24,6 @@ func TestGetKeyType(t *testing.T) {
 		want  Type
 	}{
 		{"rsa", RSA},
-		{"dsa", DSA},
 		{"ecdsa", ECDSA},
 		{"ed25519", ED25519},
 		{"", INVALID},

@@ -18,8 +18,6 @@ func GetKeySize(t Type) KeySize {
 	switch t {
 	case RSA:
 		return &RSAKeySize{}
-	case DSA:
-		return &DSAKeySize{}
 	case ECDSA:
 		return &ECDSAKeySize{}
 	case ED25519:
@@ -34,8 +32,6 @@ func GetGenerator(o *Options) Generator {
 	switch o.KeyType {
 	case RSA:
 		return &RSAGenerator{ks: o.KeySize, pwd: o.PassPhrase}
-	case DSA:
-		return &DSAGenerator{ks: o.KeySize, pwd: o.PassPhrase}
 	case ECDSA:
 		return &ECDSAGenerator{ks: o.KeySize, pwd: o.PassPhrase}
 	case ED25519:

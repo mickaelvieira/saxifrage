@@ -15,6 +15,6 @@ func isSection(i string) bool {
 
 func getSection(i string) string {
 	k := strings.ToLower(i)
-	v, _ := sections[k]
+	v := sections[k]
 	return v
 }

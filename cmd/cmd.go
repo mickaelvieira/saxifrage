@@ -40,7 +40,7 @@ type command struct {
 // Run runs the application
 func (a *App) Run(args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("Cannot run the application. Arguments are missing")
+		return fmt.Errorf("cannot run the application. Arguments are missing")
 	}
 
 	a.Executable = filepath.Base(args[0])
@@ -52,7 +52,7 @@ func (a *App) Run(args []string) error {
 
 	c := a.find(n)
 	if c == nil {
-		return fmt.Errorf("Command '%s' does not exist", n)
+		return fmt.Errorf("command '%s' does not exist", n)
 	}
 
 	return c.Action(a)
