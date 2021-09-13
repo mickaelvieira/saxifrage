@@ -8,6 +8,7 @@ ENV GO111MODULE=on
 ENV CGO_ENABLED=0
 
 COPY cmd/ cmd/
+COPY test test/
 COPY config/ config/
 COPY keys/ keys/
 COPY lexer/ lexer/
