@@ -49,3 +49,34 @@ $ sax
   version       Display the application version
 
 ```
+## Docker container
+
+Build the docker image
+
+```sh
+$ make docker-build
+```
+
+Run the container from the newly created image
+
+```sh
+$ docker run \
+    -v /etc/ssh/ssh_config:/etc/ssh/ssh_config \
+    -v ~/.ssh/config:/.ssh/config \
+    --tty \
+    --name sax \
+    --rm \
+    saxifrage ls
+```
+
+You can also run it with podman
+
+```sh
+$ podman run \
+    -v /etc/ssh/ssh_config:/etc/ssh/ssh_config \
+    -v ~/.ssh/config:/.ssh/config \
+    --tty \
+    --name sax \
+    --rm \
+    docker-daemon:saxifrage:latest ls
+```

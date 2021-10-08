@@ -1,6 +1,4 @@
-# syntax = docker/dockerfile:1-experimental
-
-FROM --platform=${BUILDPLATFORM} golang:1.14.3-alpine AS build
+FROM golang:1.16.9-alpine AS build
 
 WORKDIR /src
 
@@ -31,5 +29,6 @@ FROM scratch AS bin-unix
 
 COPY --from=build /src/saxifrage /
 
-CMD /saxifrage
+ENTRYPOINT [ "/saxifrage" ]
 
+CMD ["version"]
