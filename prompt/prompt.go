@@ -72,7 +72,7 @@ func (p *Prompt) Confirm(t string) (bool, error) {
 			c = true
 			break
 		} else {
-			break // check static check issue https://staticcheck.io/docs/checks#SA4004
+			break // check staticcheck issue https://staticcheck.io/docs/checks#SA4004
 		}
 	}
 
