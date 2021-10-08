@@ -3,6 +3,7 @@ package template
 import (
 	"bytes"
 	"embed"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -41,6 +42,10 @@ func NewLine() string {
 	return "\n"
 }
 
+func FormatNumber(n int) string {
+	return fmt.Sprintf("%4d   ", n)
+}
+
 func IsLastOption(i1, t1, i2, t2 int) bool {
 	return i1 == t1-1 && i2 == t2-1
 }
@@ -65,6 +70,7 @@ func New() *Templates {
 	fn["middleLine"] = MiddleLine
 	fn["newline"] = NewLine
 	fn["isLastOption"] = IsLastOption
+	fn["formatNumber"] = FormatNumber
 	fn["line"] = Line
 
 	t := template.New("app-templates").Funcs(fn)

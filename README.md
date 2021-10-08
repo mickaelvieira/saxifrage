@@ -21,6 +21,8 @@ $ sax upgrade
 ```sh
 $ sax completion > sax.sh
 $ sudo mv ./sax.sh /usr/share/bash-completion/completions/sax
+$ sudo chown root.root /usr/share/bash-completion/completions/sax
+$ sudo chmod 0644 /usr/share/bash-completion/completions/sax
 $ source /usr/share/bash-completion/completions/sax
 ```
 

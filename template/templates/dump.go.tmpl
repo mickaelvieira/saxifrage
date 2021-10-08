@@ -1,9 +1,11 @@
-{{ define "dump" }}
-{{ range .Files }}
-{{ divider | bold }}
- {{ "File" | bold }} {{ .Path | bold | green  }}
-{{ divider | bold }}
-
-{{ range .Lines}}{{ .Number | green | bold }}  {{ . }}{{ end }}
-{{ end }}
-{{ end }}
+{{- define "dump" -}}
+{{- range .Files -}}
+  {{- topLine | faint -}}
+  {{ border | faint }} File: {{ .Path | blue }}{{ newline }}
+  {{- middleLine | faint }}
+  {{- range .Lines -}}
+    {{- border | faint }}{{ formatNumber .Number | faint }}{{ border | faint }}  {{ . -}}
+  {{ end }}
+  {{- bottomLine | faint -}}
+  {{- end -}}
+{{- end -}}
