@@ -25,7 +25,7 @@ ARG TARGETARCH
 
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags "-s -w -X main.version=${APP_VERSION}" -o saxifrage .
 
-FROM scratch AS bin-unix
+FROM scratch AS bin-linux
 
 COPY --from=build /src/saxifrage /
 
