@@ -19,7 +19,7 @@ jobs:
       - run: make binaries
       - run: |
           tagname="${GITHUB_REF#refs/tags/}"
-          gh release create "$tagname" ./*.zip --target stable --title "Release of version $tagname"
+          gh release create "$tagname" ./*.zip --target stable --title "$tagname" --notes "Release of version $tagname"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-release-asset@v1
