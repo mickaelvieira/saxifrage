@@ -17,24 +17,9 @@ jobs:
         with:
           go-version: '1.16'
       - run: make binaries
-      - run: |
+      - name: create release
+        run: |
           tagname="${GITHUB_REF#refs/tags/}"
           gh release create "$tagname" ./*.zip --target stable --title "$tagname" --notes "Release of version $tagname"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.release-id.outputs.upload_url }}
-          asset_path: ./saxifrage-linux-amd64.zip
-          asset_name: saxifrage-linux-amd64.zip
-          asset_content_type: application/zip
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.release-id.outputs.upload_url }}
-          asset_path: ./saxifrage-darwin-amd64.zip
-          asset_name: saxifrage-darwin-amd64.zip
-          asset_content_type: application/zip
