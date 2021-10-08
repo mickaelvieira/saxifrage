@@ -1,13 +1,30 @@
-{{ define "list" }}
-{{ range .Files }}
-{{ divider | bold }}
- {{ "File" | bold }} {{ .Path | bold | green  }}
-{{ divider | bold }}{{ $l := len .BuildSections }}
-{{ if eq $l 0 }}
- No sections have been defined in this file
-{{ else }}{{ range .BuildSections }}
- {{ .Type | bold }}{{ .Separator }}{{ .Matching | green | bold }}
-{{ range .Options }}
-     {{ .Name | bold }}{{ .Separator }}{{ .Value | green | bold }}{{ end }}
-{{ end }}{{ end }}{{ end }}
-{{ end }}
+{{- define "list" -}}
+     {{- $t1 := len .Files -}}
+     {{- range $i1, $e1 := .Files -}}
+          {{- if eq $i1 0 -}}
+               {{- topLine | faint -}}
+          {{- else -}}
+               {{- middleLine | faint -}}
+          {{- end -}}
+          {{- border | faint }} {{ "File" }}: {{ .Path | green }}{{ newline }}
+          {{- middleLine | faint }}
+          {{- $t2 := len .Sections -}}
+          {{- range $i2, $e2 := .Sections -}}
+               {{- border | faint }} {{ .Type }}:{{ .Separator }}{{ .Matching | blue }}{{ newline }}
+               {{- border | faint -}}
+               {{- newline -}}
+               {{ range .Options -}}
+                    {{- border | faint }}    {{ .Name | magenta }}:{{ .Separator }}{{ .Value }}
+                    {{- newline -}}
+               {{- end -}}
+               {{- border | faint }}{{ newline -}}
+               {{ if isLastOption $i1 $t1 $i2 $t2 }}
+                    {{- bottomLine | faint -}}
+               {{ else }}
+                    {{- middleLine | faint -}}
+               {{- end -}}
+          {{- else -}}
+               {{- border | faint }} No sections have been defined in this file{{ newline }}
+          {{- end -}}
+     {{- end -}}
+{{- end -}}
