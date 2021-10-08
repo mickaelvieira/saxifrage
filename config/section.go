@@ -95,7 +95,7 @@ type Options []*Option
 // FindByName returns the first section matching the predicate
 func (o Options) FindByName(n string) *Option {
 	for _, option := range o {
-		if strings.ToLower(n) == strings.ToLower(option.Name) {
+		if strings.EqualFold(n, option.Name) {
 			return option
 		}
 	}

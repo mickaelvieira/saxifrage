@@ -8,9 +8,9 @@ import (
 
 // Parsing errors
 var (
-	ErrExpectedKeyword   = errors.New("A keyword was expected")
-	ErrExpectedSeparated = errors.New("A separator was expected")
-	ErrExpectedValue     = errors.New("A value was expected")
+	ErrExpectedKeyword   = errors.New("a keyword was expected")
+	ErrExpectedSeparated = errors.New("a separator was expected")
+	ErrExpectedValue     = errors.New("a value was expected")
 )
 
 // keyword is composed of a 3 tokens, a name, a separator, and a value
@@ -50,10 +50,6 @@ func (k *keyword) add(t *lexer.Token) (err error) {
 		k.tokens = append(k.tokens, t)
 	}
 	return err
-}
-
-func (k *keyword) isEmpty() bool {
-	return len(k.tokens) == 0
 }
 
 func (k *keyword) isComplete() bool {

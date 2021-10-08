@@ -6,11 +6,11 @@ import (
 
 // Files errors
 var (
-	ErrMissingUserConfig        = errors.New("Unable to find user configuration file")
-	ErrMissingSection           = errors.New("A Host or Match keyword was expected")
-	ErrMissingIdentityFileValue = errors.New("Section does not have IdentityFile value")
-	ErrIsSSHBasedDirection      = errors.New("The key directory is the based directory")
-	ErrDirectoryIsNotEmpty      = errors.New("The directory is not empty")
+	ErrMissingUserConfig        = errors.New("unable to find user configuration file")
+	ErrMissingSection           = errors.New("a Host or Match keyword was expected")
+	ErrMissingIdentityFileValue = errors.New("section does not have IdentityFile value")
+	ErrIsSSHBasedDirection      = errors.New("the key directory is the based directory")
+	ErrDirectoryIsNotEmpty      = errors.New("the directory is not empty")
 )
 
 func contains(n []int, e int) bool {

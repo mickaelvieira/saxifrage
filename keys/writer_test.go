@@ -31,7 +31,6 @@ func TestDefaultFilenames(t *testing.T) {
 		want2  string
 	}{
 		{RSA, "id_rsa", "id_rsa.pub"},
-		{DSA, "id_dsa", "id_dsa.pub"},
 		{ECDSA, "id_ecdsa", "id_ecdsa.pub"},
 		{ED25519, "id_ed25519", "id_ed25519.pub"},
 	}

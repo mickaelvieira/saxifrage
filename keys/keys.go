@@ -2,13 +2,11 @@ package keys
 
 import (
 	"crypto"
-	"crypto/dsa"
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"encoding/asn1"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -23,7 +21,6 @@ type Type string
 // Types list
 const (
 	RSA     Type = "rsa"
-	DSA     Type = "dsa"
 	ECDSA   Type = "ecdsa"
 	ED25519 Type = "ed25519"
 	INVALID Type = "invalid"
@@ -41,7 +38,7 @@ type Options struct {
 }
 
 // Types contains the list of key types
-var Types = []Type{RSA, DSA, ECDSA, ED25519}
+var Types = []Type{RSA, ECDSA, ED25519}
 
 // GetDefaultType returns the default type
 func GetDefaultType() Type {
@@ -60,12 +57,12 @@ func TypesToString() string {
 
 // Keys errors
 var (
-	ErrNotImplementedKeyType  = errors.New("This type of key is not yet implemented")
-	ErrInvalidKeySize         = errors.New("Invalid key size")
-	ErrInvalidKeyType         = errors.New("Invalid key type. Type should be equal to rsa, dsa, ecdsa or ed25519")
-	ErrPrivateKeyNotGenerated = errors.New("Private key must be generated before generating the public key")
+	ErrNotImplementedKeyType  = errors.New("this type of key is not yet implemented")
+	ErrInvalidKeySize         = errors.New("invalid key size")
+	ErrInvalidKeyType         = errors.New("invalid key type. Type should be equal to rsa, dsa, ecdsa or ed25519")
+	ErrPrivateKeyNotGenerated = errors.New("private key must be generated before generating the public key")
 	ErrKeySizeNotValid        = errors.New("key size is not valid")
-	ErrKeyOverrideNotAllowed  = errors.New("Overriding the key is not allowed")
+	ErrKeyOverrideNotAllowed  = errors.New("overriding the key is not allowed")
 )
 
 // GetKeyType retrieves key type from user's input
@@ -109,12 +106,6 @@ func EncodeToPEM(privateKey crypto.PrivateKey, pwd string) ([]byte, error) {
 			return nil, err
 		}
 		blk = &pem.Block{Type: "EC PRIVATE KEY", Bytes: der}
-	case *dsa.PrivateKey:
-		der, err = asn1.Marshal(sk.PublicKey)
-		if err != nil {
-			return nil, err
-		}
-		blk = &pem.Block{Type: "PUBLIC KEY", Bytes: der}
 	case ed25519.PrivateKey:
 		der, err = x509.MarshalPKCS8PrivateKey(sk)
 		if err != nil {
@@ -122,10 +113,11 @@ func EncodeToPEM(privateKey crypto.PrivateKey, pwd string) ([]byte, error) {
 		}
 		blk = &pem.Block{Type: "OPENSSH PRIVATE KEY", Bytes: der}
 	default:
-		return nil, fmt.Errorf("Invalid KEY type %v", sk)
+		return nil, fmt.Errorf("invalid KEY type %v", sk)
 	}
 
 	if pwd != "" {
+		//lint:ignore SA1019 I'll address this issue later
 		blk, err = x509.EncryptPEMBlock(rand.Reader, blk.Type, blk.Bytes, []byte(pwd), x509.PEMCipherAES256)
 		if err != nil {
 			return nil, err

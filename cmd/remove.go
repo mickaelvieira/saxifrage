@@ -39,7 +39,7 @@ func runRemove(a *App) error {
 
 	section := sections.FindSectionByMatchingValue(r)
 	if section == nil {
-		return fmt.Errorf("Cannot find section matching %s", r)
+		return fmt.Errorf("cannot find section matching %s", r)
 	}
 
 	lines := file.FindSectionLines(section.Matching)

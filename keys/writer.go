@@ -19,9 +19,8 @@ func GetFilenamesFromType(t Type) (pk string, pub string) {
 // GetFilenamesFromString returns a pair of string based on user's input
 // The first value is the name of the private key
 // The second value is the name of the public key
-func GetFilenamesFromString(s string) (pk string, pub string) {
-	pk = fmt.Sprintf("%s", string(s))
-	pub = fmt.Sprintf("%s.pub", pk)
+func GetFilenamesFromString(pk string) (string, string) {
+	pub := fmt.Sprintf("%s.pub", pk)
 	return pk, pub
 }
 
@@ -64,7 +63,7 @@ func MakeDir(path string) error {
 			return err
 		}
 	} else if !i.IsDir() {
-		return fmt.Errorf("File '%s' exists but it is not a directory", path)
+		return fmt.Errorf("file '%s' exists but it is not a directory", path)
 	}
 	return nil
 }

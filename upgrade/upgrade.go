@@ -94,7 +94,7 @@ func GetLatestVersion() (string, error) {
 
 	s := strings.Trim(string(b), " \n")
 	if s == "" {
-		return s, fmt.Errorf("Cannot find version")
+		return s, fmt.Errorf("cannot find version")
 	}
 
 	return s, nil
@@ -103,10 +103,10 @@ func GetLatestVersion() (string, error) {
 // GetPlatformArchiveName retrieves the zip filename for the current platform
 func GetPlatformArchiveName() (string, error) {
 	if runtime.GOARCH != "amd64" {
-		return "", fmt.Errorf("Arch %s is not supported", runtime.GOARCH)
+		return "", fmt.Errorf("arch %s is not supported", runtime.GOARCH)
 	}
 	if runtime.GOOS != "linux" && runtime.GOOS != "darwin" {
-		return "", fmt.Errorf("Operating system %s is not supported", runtime.GOOS)
+		return "", fmt.Errorf("operating system %s is not supported", runtime.GOOS)
 	}
 	return fmt.Sprintf("saxifrage-%s-%s.zip", runtime.GOOS, runtime.GOARCH), nil
 }

@@ -3,6 +3,11 @@ updates:
 - package-ecosystem: gomod
   directory: "/"
   schedule:
-    interval: daily
-    time: '11:00'
+    interval: "monthly"
+    time: "11:00"
   open-pull-requests-limit: 10
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "monthly"
+    time: "12:00"

@@ -76,7 +76,6 @@ func (p *Prompt) Confirm(t string) (bool, error) {
 		if t == "y" {
 			c = true
 		}
-		break
 	}
 
 	if err := s.Err(); err != nil {

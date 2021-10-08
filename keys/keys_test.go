@@ -13,7 +13,7 @@ func TestGetDefaultType(t *testing.T) {
 }
 
 func TestTypesToString(t *testing.T) {
-	want := "rsa, dsa, ecdsa, ed25519"
+	want := "rsa, ecdsa, ed25519"
 	got := TypesToString()
 	assert.Equal(t, want, got, "Strings don't match")
 }
@@ -24,7 +24,6 @@ func TestGetKeyType(t *testing.T) {
 		want  Type
 	}{
 		{"rsa", RSA},
-		{"dsa", DSA},
 		{"ecdsa", ECDSA},
 		{"ed25519", ED25519},
 		{"", INVALID},
