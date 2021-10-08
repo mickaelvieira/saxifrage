@@ -14,9 +14,35 @@ import (
 //go:embed templates/*.tmpl
 var content embed.FS
 
+const lineLen = 80
+
 // Divider helper tp create a dividing line
 func Divider() string {
-	return "====================================================="
+	return strings.Repeat("─", lineLen)
+}
+
+func TopLine() string {
+	return "┌" + strings.Repeat("─", lineLen) + "\n"
+}
+
+func MiddleLine() string {
+	return "├" + strings.Repeat("─", lineLen) + "\n"
+}
+
+func BottomLine() string {
+	return "└" + strings.Repeat("─", lineLen) + "\n"
+}
+
+func Border() string {
+	return "│"
+}
+
+func NewLine() string {
+	return "\n"
+}
+
+func IsLastOption(i1, t1, i2, t2 int) bool {
+	return i1 == t1-1 && i2 == t2-1
 }
 
 // Line draws a line of the given length
@@ -32,7 +58,13 @@ type Templates struct {
 // New creates a new Template struct
 func New() *Templates {
 	fn := promptui.FuncMap
+	fn["border"] = Border
 	fn["divider"] = Divider
+	fn["topLine"] = TopLine
+	fn["bottomLine"] = BottomLine
+	fn["middleLine"] = MiddleLine
+	fn["newline"] = NewLine
+	fn["isLastOption"] = IsLastOption
 	fn["line"] = Line
 
 	t := template.New("app-templates").Funcs(fn)
