@@ -6,13 +6,16 @@ GOSEC       := gosec --quiet
 APP_VERSION := $(shell cat .github/.version)
 GO_LDFLAGS  := -ldflags "-s -w -X main.version=$(APP_VERSION)"
 
-.PHONY: build binaries run test fmt clean lint help
+.PHONY: build docker-build buildah-build binaries run test fmt clean lint help
 
 build:	## Build the binary for the current platform
 	CGO_ENABLED=0 go build $(GO_LDFLAGS)
 
 docker-build:	## Build application in a docker image
-	sudo docker build  --rm --build-arg APP_VERSION=$(APP_VERSION) -t saxifrage:latest .
+	sudo docker build --rm --build-arg APP_VERSION=$(APP_VERSION) -t saxifrage:latest .
+
+buildah-build: ## Build application in a buildah image
+	sudo buildah build -f Dockerfile --build-arg TARGETOS=linux --build-arg TARGETARCH=amd64 --rm --layers --build-arg APP_VERSION=$(APP_VERSION) -t saxifrage:latest .
 
 binaries:	## Build and zip the binary for Linux and MacOS
 	./scripts/create-binaries

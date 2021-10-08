@@ -49,15 +49,17 @@ $ sax
   version       Display the application version
 
 ```
-## Docker container
+## Running Saxifrage in a container
 
-Build the docker image
+### Docker container
+
+Build the `docker` image
 
 ```sh
 $ make docker-build
 ```
 
-Run the container from the newly created image
+Run the container with `docker`
 
 ```sh
 $ docker run \
@@ -69,7 +71,15 @@ $ docker run \
     saxifrage ls
 ```
 
-You can also run it with podman
+### Buildah Container
+
+Build the `buildah` image
+
+```sh
+$ make buildah-build
+```
+
+Run the container with `podman`
 
 ```sh
 $ podman run \
@@ -78,5 +88,5 @@ $ podman run \
     --tty \
     --name sax \
     --rm \
-    docker-daemon:saxifrage:latest ls
+    saxifrage:latest ls
 ```
