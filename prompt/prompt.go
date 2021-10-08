@@ -57,12 +57,7 @@ func (p *Prompt) Msg(m string) error {
 
 // Confirm asks for user confirmation
 func (p *Prompt) Confirm(t string) (bool, error) {
-	o := struct {
-		Text    string
-		Default string
-	}{
-		Text: t,
-	}
+	o := struct{ Text string }{Text: t}
 
 	var c bool
 
@@ -75,6 +70,9 @@ func (p *Prompt) Confirm(t string) (bool, error) {
 		t := s.Text()
 		if t == "y" {
 			c = true
+			break
+		} else {
+			break // check staticcheck issue https://staticcheck.io/docs/checks#SA4004
 		}
 	}
 
