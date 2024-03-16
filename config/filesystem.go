@@ -2,7 +2,6 @@ package config
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,7 +10,7 @@ import (
 // WriteToFile writes the key to a file
 func WriteToFile(b []byte) error {
 	p := GetUserConfigPath()
-	err := ioutil.WriteFile(p, b, 0600)
+	err := os.WriteFile(p, b, 0600)
 	if err != nil {
 		return err
 	}

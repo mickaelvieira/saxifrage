@@ -2,7 +2,7 @@ package upgrade
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -57,12 +57,12 @@ func Download(p *prompt.Prompt, filename, version string) error {
 	}
 	defer r.Body.Close()
 
-	c, err := ioutil.ReadAll(r.Body)
+	c, err := io.ReadAll(r.Body)
 	if err != nil {
 		return err
 	}
 
-	if e := ioutil.WriteFile(filepath.Clean(filename), c, 0600); e != nil {
+	if e := os.WriteFile(filepath.Clean(filename), c, 0600); e != nil {
 		return e
 	}
 
@@ -87,7 +87,7 @@ func GetLatestVersion() (string, error) {
 	}
 	defer r.Body.Close()
 
-	b, err := ioutil.ReadAll(r.Body)
+	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		return "", err
 	}
