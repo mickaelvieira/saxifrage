@@ -118,7 +118,7 @@ func EncodeToPEM(privateKey crypto.PrivateKey, pwd string) ([]byte, error) {
 
 	if pwd != "" {
 		//lint:ignore SA1019 I'll address this issue later
-		blk, err = x509.EncryptPEMBlock(rand.Reader, blk.Type, blk.Bytes, []byte(pwd), x509.PEMCipherAES256)
+		blk, err = x509.EncryptPEMBlock(rand.Reader, blk.Type, blk.Bytes, []byte(pwd), x509.PEMCipherAES256) //nolint:staticcheck
 		if err != nil {
 			return nil, err
 		}

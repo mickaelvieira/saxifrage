@@ -2,7 +2,7 @@ package parser
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/mickaelvieira/saxifrage/config"
@@ -64,7 +64,7 @@ func (p *parser) parse() error {
 
 // loadContent loads the file's content or panic if there are any errors
 func loadContent(path string) (s string, err error) {
-	b, err := ioutil.ReadFile(filepath.Clean(path))
+	b, err := os.ReadFile(filepath.Clean(path))
 	if err != nil {
 		return s, err
 	}

@@ -2,7 +2,6 @@ package keys
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -45,7 +44,7 @@ func Writekeys(publicKey []byte, privateKey []byte, opts *Options) error {
 
 // WriteToFile writes the key to a file
 func WriteToFile(b []byte, path string) error {
-	err := ioutil.WriteFile(filepath.Clean(path), b, 0600)
+	err := os.WriteFile(filepath.Clean(path), b, 0600)
 	if err != nil {
 		return err
 	}

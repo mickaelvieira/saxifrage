@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/mickaelvieira/saxifrage/upgrade"
@@ -40,7 +39,7 @@ func runUpgrade(a *App) error {
 		if err != nil {
 			return err
 		}
-		tempDir, err := ioutil.TempDir(binDir, "saxifrage-*")
+		tempDir, err := os.MkdirTemp(binDir, "saxifrage-*")
 		if err != nil {
 			return err
 		}
