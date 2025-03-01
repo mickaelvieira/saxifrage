@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/hashicorp/go-version v1.7.0
 	github.com/manifoldco/promptui v0.9.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/crypto v0.31.0
 )
 
