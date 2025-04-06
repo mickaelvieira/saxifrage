@@ -3,6 +3,7 @@ package upgrade
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -55,7 +56,12 @@ func Download(p *prompt.Prompt, filename, version string) error {
 	if err != nil {
 		return err
 	}
-	defer r.Body.Close()
+
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Println(err)
+		}
+	}()
 
 	c, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -85,7 +91,12 @@ func GetLatestVersion() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer r.Body.Close()
+
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Println(err)
+		}
+	}()
 
 	b, err := io.ReadAll(r.Body)
 	if err != nil {

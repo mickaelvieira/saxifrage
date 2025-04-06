@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/mickaelvieira/saxifrage/upgrade"
@@ -46,7 +47,12 @@ func runUpgrade(a *App) error {
 		if e := os.Chdir(tempDir); e != nil {
 			return e
 		}
-		defer os.RemoveAll(tempDir)
+
+		defer func() {
+			if err := os.RemoveAll(tempDir); err != nil {
+				log.Println(err)
+			}
+		}()
 
 		if e := upgrade.Download(a.Prompt, filename, latest); e != nil {
 			return e
